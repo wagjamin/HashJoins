@@ -1,0 +1,61 @@
+# ---------------------------------------------------------------------------
+# Seminar Template
+# ---------------------------------------------------------------------------
+
+stages:
+    - build
+    - test
+    - cleanup
+
+make:
+    stage: build
+    script:
+        - mkdir -p build
+        - cd build
+        - cmake -DCMAKE_BUILD_TYPE=Debug ..
+        - make
+    cache:
+        key: "$CI_COMMIT_REF_NAME"
+        paths:
+            - build/
+        policy: pull-push
+    tags:
+        - "cmake"
+
+tester:
+    stage: test
+    script:
+        - mkdir -p build
+        - cd build
+        - cmake -DCMAKE_BUILD_TYPE=Debug ..
+        - make check
+    cache:
+        key: "$CI_COMMIT_REF_NAME"
+        paths:
+            - build/
+        policy: pull
+    tags:
+        - "cmake"
+
+cpplint:
+    stage: test
+    script:
+        - mkdir -p build
+        - cd build
+        - cmake -DCMAKE_BUILD_TYPE=Debug ..
+        - make lint
+    tags:
+        - "cmake"
+        - "python3"
+
+clear_cache:
+    stage: cleanup
+    script:
+        - rm -rf ./build/*
+    cache:
+        key: "$CI_COMMIT_REF_NAME"
+        paths:
+            - build/
+        policy: pull-push
+    when: manual
+    allow_failure: true
