@@ -16,10 +16,12 @@ set(SRC_LIB_EXAMPLE_H
 
 set(SRC_LIB_EXAMPLE_CC
     "${CMAKE_SOURCE_DIR}/joins/src/example/bubble_sort.cc"
+        "${CMAKE_SOURCE_DIR}/joins/src/generators/uniform_generator.cpp"
     )
 
 set(TEST_LIB_EXAMPLE_CC
     "${CMAKE_SOURCE_DIR}/joins/test/example/bubble_sort_test.cc"
+        "${CMAKE_SOURCE_DIR}/joins/test/generators/uniform_generator_test.cpp"
     "${CMAKE_SOURCE_DIR}/joins/test/tester.cc"
     )
 
