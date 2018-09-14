@@ -5,20 +5,20 @@
 #ifndef HASHJOINS_JOIN_H
 #define HASHJOINS_JOIN_H
 
-#include<vector>
+#include <vector>
+#include <memory>
 
 namespace algorithms{
 
     /**
      * Base Class for all joins.
      */
-    class Join{
+    class join{
 
     public:
-        Join(Tuple* left, Tuple* right, size_t size_left, size_t size_right);
-        Join(std::vector<uint64_t> left, std::vector<uint64_t> right);
+        join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right) = 0;
 
-        ~Join();
+        ~join() = 0;
 
 
     };

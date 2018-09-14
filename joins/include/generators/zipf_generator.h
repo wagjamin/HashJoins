@@ -5,8 +5,9 @@
 #ifndef HASHJOINS_ZIPF_GENERATOR_H
 #define HASHJOINS_ZIPF_GENERATOR_H
 
-#include<memory>
-#include<vector>
+#include <memory>
+#include <vector>
+#include "algorithms/tuple.h"
 
 class uniform_generator{
 

@@ -33,7 +33,7 @@ TEST(UniGenTest, DistTester) {
     auto count = static_cast<uint64_t>(1) << static_cast<uint64_t>(25);
     uniform_generator gen(min, max, count);
     gen.build();
-    // Create value historgramm
+    // Create value historgram
     auto freq = std::make_unique<std::vector<uint64_t>>(max);
     for(auto& item: *gen.get().get()){
         (*freq)[item.value - 1]++;
@@ -41,8 +41,8 @@ TEST(UniGenTest, DistTester) {
     // Ensure that histogramm values fluctuate around mean
     auto expected = static_cast<uint64_t>(count/max);
     for(auto& item: *freq){
-        ASSERT_LE(static_cast<uint64_t>(0.9*expected), item);
-        ASSERT_GE(static_cast<uint64_t>(1.1*expected), item);
+        ASSERT_LE(static_cast<uint64_t>(0.95*expected), item);
+        ASSERT_GE(static_cast<uint64_t>(1.05*expected), item);
     }
 }
 
