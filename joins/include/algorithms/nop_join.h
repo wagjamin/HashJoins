@@ -5,11 +5,13 @@
 #ifndef HASHJOINS_NOP_JOIN_H
 #define HASHJOINS_NOP_JOIN_H
 
-#include "join.h"
+#include <memory>
+#include <vector>
+#include "tuple.h"
 
 namespace algorithms{
 
-    class nop_join: public join {
+    class nop_join {
 
     public:
         /// Basic constructor, join will be running on 4 threads by default
@@ -26,16 +28,18 @@ namespace algorithms{
 
 
     private:
-        /// Number of threads that should be used when performing the NOP join
-        uint64_t threads;
-        /// table_size*|left| is the size of the hash table being built
-        double table_size;
         /// Left join partner
         std::shared_ptr<std::vector<tuple>> left;
         /// Right join partner
         std::shared_ptr<std::vector<tuple>> right;
+        /// Number of threads that should be used when performing the NOP join
+        uint64_t threads;
+        /// table_size*|left| is the size of the hash table being built
+        double table_size;
         /// Result vector
         std::shared_ptr<std::vector<uint64_t[3]>> result;
+
+        struct hash_table;
 
     };
 

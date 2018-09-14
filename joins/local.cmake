@@ -8,7 +8,7 @@
 
 set(SRC_LIB_EXAMPLE_H
     "${CMAKE_SOURCE_DIR}/joins/include/example/bubble_sort.h"
-        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/join.h"
+        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/tuple.h"
         "${CMAKE_SOURCE_DIR}/joins/include/generators/uniform_generator.h"
         "${CMAKE_SOURCE_DIR}/joins/include/generators/zipf_generator.h"
@@ -17,6 +17,7 @@ set(SRC_LIB_EXAMPLE_H
 set(SRC_LIB_EXAMPLE_CC
     "${CMAKE_SOURCE_DIR}/joins/src/example/bubble_sort.cc"
         "${CMAKE_SOURCE_DIR}/joins/src/generators/uniform_generator.cpp"
+        "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join.cpp"
     )
 
 set(TEST_LIB_EXAMPLE_CC
