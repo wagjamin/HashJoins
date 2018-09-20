@@ -7,10 +7,12 @@
 
 #include <memory>
 #include <vector>
+#include <tuple>
 #include "tuple.h"
 
 namespace algorithms{
 
+    /// Very simple no partitioning join using no threads at all
     class nop_join {
 
     public:
@@ -18,13 +20,13 @@ namespace algorithms{
         nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right);
         /// Join constructor with additional parameters
         nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right,
-                 uint64_t threads, double table_size);
+                 double table_size);
 
         /// Performs the actual join and writes result
-        void build();
+        void execute();
 
         /// Returns a pointer to the result vector
-        std::shared_ptr<std::vector<uint64_t[3]>> get();
+        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>> get();
 
 
     private:
@@ -32,12 +34,10 @@ namespace algorithms{
         std::shared_ptr<std::vector<tuple>> left;
         /// Right join partner
         std::shared_ptr<std::vector<tuple>> right;
-        /// Number of threads that should be used when performing the NOP join
-        uint64_t threads;
         /// table_size*|left| is the size of the hash table being built
         double table_size;
         /// Result vector
-        std::shared_ptr<std::vector<uint64_t[3]>> result;
+        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>> result;
 
         struct hash_table;
 

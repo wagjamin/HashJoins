@@ -36,6 +36,13 @@ namespace generators{
          */
         std::shared_ptr<std::vector<algorithms::tuple>> get();
 
+        /// Member-wise copy and move is fine
+        ~uniform_generator() = default;
+        uniform_generator(const uniform_generator& t) = default;
+        uniform_generator(uniform_generator&& t) = default;
+        uniform_generator& operator=(const uniform_generator& t) = default;
+        uniform_generator& operator=(uniform_generator&& t) = default;
+
     private:
         uint64_t min;
         uint64_t max;

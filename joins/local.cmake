@@ -23,7 +23,8 @@ set(SRC_LIB_EXAMPLE_CC
 set(TEST_LIB_EXAMPLE_CC
     "${CMAKE_SOURCE_DIR}/joins/test/example/bubble_sort_test.cc"
         "${CMAKE_SOURCE_DIR}/joins/test/generators/uniform_generator_test.cpp"
-    "${CMAKE_SOURCE_DIR}/joins/test/tester.cc"
+        "${CMAKE_SOURCE_DIR}/joins/test/algorithms/nop_join_test.cpp"
+        "${CMAKE_SOURCE_DIR}/joins/test/tester.cc"
     )
 
 # ---------------------------------------------------------------------------
