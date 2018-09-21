@@ -20,8 +20,8 @@ TEST(UniGenTest, RangeTester) {
         gen.build();
         auto vec = gen.get().get();
         for(auto& curr: *vec){
-            ASSERT_GE(curr.value, min);
-            ASSERT_LE(curr.value, max);
+            ASSERT_GE(std::get<0>(curr), min);
+            ASSERT_LE(std::get<0>(curr), max);
         }
     }
 }
@@ -36,7 +36,7 @@ TEST(UniGenTest, DistTester) {
     // Create value historgram
     auto freq = std::make_unique<std::vector<uint64_t>>(max);
     for(auto& item: *gen.get().get()){
-        (*freq)[item.value - 1]++;
+        (*freq)[std::get<0>(item) - 1]++;
     }
     // Ensure that histogramm values fluctuate around mean
     auto expected = static_cast<uint64_t>(count/max);
@@ -52,8 +52,8 @@ TEST(UniGenTest, RIDTester){
     gen.build();
     std::unordered_set<uint64_t> my_set = std::unordered_set<uint64_t>();
     for(auto& item: *gen.get().get()){
-        ASSERT_EQ(my_set.find(item.rid), my_set.end());
-        my_set.insert(item.rid);
+        ASSERT_EQ(my_set.find(std::get<1>(item)), my_set.end());
+        my_set.insert(std::get<1>(item));
     }
 }
 

@@ -7,7 +7,7 @@
 
 #include <memory>
 #include <vector>
-#include "algorithms/tuple.h"
+#include <tuple>
 
 namespace generators{
 
@@ -33,8 +33,10 @@ namespace generators{
         /**
          * Returns a shared vector containing the generated data.
          * May not be called without previous call to build.
+         * The first tuple element contains the values following the distribution, the
+         * second tuple element contains the RID.
          */
-        std::shared_ptr<std::vector<algorithms::tuple>> get();
+        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> get();
 
         /// Member-wise copy and move is fine
         ~uniform_generator() = default;
@@ -47,8 +49,7 @@ namespace generators{
         uint64_t min;
         uint64_t max;
         size_t count;
-        std::shared_ptr<std::vector<algorithms::tuple>> data;
-
+        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> data;
     };
 
 } // namespace generators

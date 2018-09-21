@@ -9,9 +9,7 @@
 set(SRC_LIB_EXAMPLE_H
     "${CMAKE_SOURCE_DIR}/joins/include/example/bubble_sort.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
-        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/tuple.h"
         "${CMAKE_SOURCE_DIR}/joins/include/generators/uniform_generator.h"
-        "${CMAKE_SOURCE_DIR}/joins/include/generators/zipf_generator.h"
     )
 
 set(SRC_LIB_EXAMPLE_CC

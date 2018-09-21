@@ -8,7 +8,6 @@
 #include <memory>
 #include <vector>
 #include <tuple>
-#include "tuple.h"
 
 namespace algorithms{
 
@@ -16,6 +15,11 @@ namespace algorithms{
     class nop_join {
 
     public:
+        /// First element is the value on which should be joined, second one the rid
+        typedef std::tuple<uint64_t, uint64_t> tuple;
+        /// Join result, containing (join_val, rid_left, rid_right)
+        typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
+
         /// Basic constructor, join will be running on 4 threads by default
         nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right);
         /// Join constructor with additional parameters
@@ -26,7 +30,7 @@ namespace algorithms{
         void execute();
 
         /// Returns a pointer to the result vector
-        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>> get();
+        std::shared_ptr<std::vector<triple>> get();
 
 
     private:
@@ -37,7 +41,7 @@ namespace algorithms{
         /// table_size*|left| is the size of the hash table being built
         double table_size;
         /// Result vector
-        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>> result;
+        std::shared_ptr<std::vector<triple>> result;
 
         struct hash_table;
 

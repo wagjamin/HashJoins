@@ -56,7 +56,7 @@ namespace algorithms{
         hash_table table = hash_table(new_size);
         // Build Phase
         for(tuple& curr: *left){
-            uint64_t index = curr.value % new_size;
+            uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             switch(bucket.count){
                 case 0:
@@ -83,25 +83,25 @@ namespace algorithms{
         // Initialize result array
         result = std::make_shared<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>>();
         for(tuple& curr: *right){
-            uint64_t index = curr.value % new_size;
+            uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             // Follow overflow buckets
             if(bucket.count > 2){
                 hash_table::bucket::overflow* curr_over = bucket.next.get();
                 for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 2); ++i){
-                    if(curr_over->t.value == curr.value){
-                        result->push_back({curr_over->t.value, curr_over->t.rid, curr.rid});
+                    if(std::get<0>(curr_over->t) == std::get<0>(curr)){
+                        result->push_back({std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr)});
                     }
                     curr_over = curr_over->next.get();
                 }
             }
             // Look at second tuple
-            if(bucket.count > 1 && bucket.t2.value == curr.value){
-                result->push_back({bucket.t2.value, bucket.t2.rid, curr.rid});
+            if(bucket.count > 1 && std::get<0>(bucket.t2) == std::get<0>(curr)){
+                result->push_back({std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr)});
             }
             // Look at first tuple
-            if(bucket.count > 0 && bucket.t1.value == curr.value){
-                result->push_back({bucket.t1.value, bucket.t1.rid, curr.rid});
+            if(bucket.count > 0 && std::get<0>(bucket.t1) == std::get<0>(curr)){
+                result->push_back({std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr)});
             }
         }
     }
