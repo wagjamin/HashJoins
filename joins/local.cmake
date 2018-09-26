@@ -7,19 +7,21 @@
 # ---------------------------------------------------------------------------
 
 set(SRC_LIB_EXAMPLE_H
-    "${CMAKE_SOURCE_DIR}/joins/include/example/bubble_sort.h"
+        "${CMAKE_SOURCE_DIR}/joins/include/example/bubble_sort.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
+        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/radix_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/generators/uniform_generator.h"
     )
 
 set(SRC_LIB_EXAMPLE_CC
-    "${CMAKE_SOURCE_DIR}/joins/src/example/bubble_sort.cc"
+        "${CMAKE_SOURCE_DIR}/joins/src/example/bubble_sort.cc"
         "${CMAKE_SOURCE_DIR}/joins/src/generators/uniform_generator.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join.cpp"
+        "${CMAKE_SOURCE_DIR}/joins/src/algorithms/radix_join.cpp"
     )
 
 set(TEST_LIB_EXAMPLE_CC
-    "${CMAKE_SOURCE_DIR}/joins/test/example/bubble_sort_test.cc"
+        "${CMAKE_SOURCE_DIR}/joins/test/example/bubble_sort_test.cc"
         "${CMAKE_SOURCE_DIR}/joins/test/generators/uniform_generator_test.cpp"
         "${CMAKE_SOURCE_DIR}/joins/test/algorithms/nop_join_test.cpp"
         "${CMAKE_SOURCE_DIR}/joins/test/tester.cc"

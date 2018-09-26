@@ -4,10 +4,10 @@
 
 #include "algorithms/nop_join.h"
 #include <utility>
-#include <mutex>
 
 namespace algorithms{
 
+    /// Simple chained hash table used within the nop join
     struct nop_join::hash_table{
         /// One of the hash table entries
         struct bucket{
@@ -42,14 +42,7 @@ namespace algorithms{
        nop_join(std::move(left), std::move(right), 1.5){}
 
     nop_join::nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right, double table_size):
-            left(left), right(right), table_size(table_size), result() {
-        // Internally, the left table should always be the one with which we execute, i.e. the smaller one
-        if((*left).size() >= (*right).size()){
-            auto temp = right;
-            right = left;
-            left = right;
-        }
-    }
+            left(left), right(right), table_size(table_size), result() {}
 
     void nop_join::execute() {
         auto new_size = static_cast<uint64_t>(1.5 * (*left).size());

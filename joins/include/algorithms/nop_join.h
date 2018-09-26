@@ -20,9 +20,9 @@ namespace algorithms{
         /// Join result, containing (join_val, rid_left, rid_right)
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
 
-        /// Basic constructor, join will be running on 4 threads by default
+        /// Basic constructor
         nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right);
-        /// Join constructor with additional parameters
+        /// Join constructor with additional parameter
         nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right,
                  double table_size);
 
