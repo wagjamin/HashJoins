@@ -42,7 +42,7 @@ namespace algorithms{
        nop_join(std::move(left), std::move(right), 1.5){}
 
     nop_join::nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right, double table_size):
-            left(left), right(right), table_size(table_size), result() {}
+            left(std::move(left)), right(std::move(right)), table_size(table_size), result() {}
 
     void nop_join::execute() {
         auto new_size = static_cast<uint64_t>(1.5 * (*left).size());
@@ -74,7 +74,7 @@ namespace algorithms{
         }
         // Probe Phase
         // Initialize result array
-        result = std::make_shared<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>>();
+        result = std::make_shared<std::vector<triple>>();
         for(tuple& curr: *right){
             uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
@@ -99,7 +99,7 @@ namespace algorithms{
         }
     }
 
-    std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t, uint64_t>>> nop_join::get() {
+    std::shared_ptr<std::vector<nop_join::triple>> nop_join::get() {
         if(result == nullptr){
             throw std::logic_error("Join must be performed before querying results.");
         }

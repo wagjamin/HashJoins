@@ -11,7 +11,7 @@
 
 namespace algorithms{
 
-    /// Very simple no partitioning join using no threads at all
+    /// Single threaded no partitioning join
     class nop_join {
 
     public:

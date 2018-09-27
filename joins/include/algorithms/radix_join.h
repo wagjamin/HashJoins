@@ -11,7 +11,7 @@
 
 namespace algorithms{
 
-    /// Very simple radix join using no threads at all
+    /// Single threaded radix join
     class radix_join {
 
     public:
