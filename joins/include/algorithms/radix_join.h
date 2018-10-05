@@ -11,7 +11,7 @@
 
 namespace algorithms{
 
-    /// Single threaded radix join
+    /// Single threaded single partition radix join
     class radix_join {
 
     public:
@@ -24,7 +24,7 @@ namespace algorithms{
         radix_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right);
         /// Join constructor with additional parameter
         radix_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right,
-                 double table_size);
+                 double table_size, uint8_t part_bits);
 
         /// Performs the actual join and writes result
         void execute();
@@ -42,8 +42,8 @@ namespace algorithms{
         double table_size;
         /// Partition bits per partition pass
         uint8_t part_bits;
-        /// Number of partitioning runs
-        uint8_t part_runs;
+        /// Total number of partitions being created
+        uint32_t part_count;
         /// Result vector
         std::shared_ptr<std::vector<triple>> result;
 
@@ -54,9 +54,8 @@ namespace algorithms{
          * @param data_t    target array into which the values should be scattered
          * @param hist      pointer to the destination histogram, should be zeroed
          * @param count     number of elements within the current partition
-         * @param start_bit bit at which partitioning should start
          */
-        void partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count, uint8_t start_bit);
+        void partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count);
 
         struct hash_table;
 
