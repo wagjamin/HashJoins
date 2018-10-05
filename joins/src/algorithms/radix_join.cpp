@@ -9,14 +9,12 @@
 namespace algorithms{
 
 
-    radix_join::radix_join(std::shared_ptr<radix_join::tuple[]> left, std::shared_ptr<tuple[]> right,
-                           uint64_t size_l, uint64_t size_r): radix_join(std::move(left), std::move(right),
-                                                                         size_l, size_r, 1.5, 6) {};
+    radix_join::radix_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r):
+            radix_join(left, right, size_l, size_r, 1.5, 6) {};
 
-    radix_join::radix_join(std::shared_ptr<radix_join::tuple[]> left, std::shared_ptr<tuple[]> right,
-                           uint64_t size_l, uint64_t size_r, double table_size,
-                           uint8_t part_bits): left(std::move(left)), right(std::move(right)), size_l(size_l),
-                                               size_r(size_r), table_size(table_size), part_bits(part_bits),
+    radix_join::radix_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r, double table_size,
+                           uint8_t part_bits): left(left), right(right), size_l(size_l), size_r(size_r),
+                                               table_size(table_size), part_bits(part_bits),
                                                part_count(static_cast<uint32_t>(1) << part_bits), result(nullptr) {};
 
     inline uint64_t radix_join::hash1(uint64_t val) {
@@ -53,13 +51,13 @@ namespace algorithms{
 
     void radix_join::execute() {
         // Partition left side
-        std::shared_ptr<tuple[]> list_l(new tuple[size_l]);
+        std::unique_ptr<tuple[]> list_l(new tuple[size_l]);
         auto hist_l = std::make_unique<uint64_t[]>(part_count);
-        partition(left.get(), list_l.get(), hist_l.get(), size_l);
+        partition(left, list_l.get(), hist_l.get(), size_l);
         // Partition right side
-        std::shared_ptr<tuple[]> list_r(new tuple[size_r]);
+        std::unique_ptr<tuple[]> list_r(new tuple[size_r]);
         auto hist_r = std::make_unique<uint64_t[]>(part_count);
-        partition(right.get(), list_r.get(), hist_r.get(), size_r);
+        partition(right, list_r.get(), hist_r.get(), size_r);
         // Join the separate partitions
         for(uint32_t part = 0; part < part_count; ++part){
             uint64_t start_l, start_r, end_l, end_r;
@@ -77,10 +75,7 @@ namespace algorithms{
             end_r = hist_r[part];
             result = std::make_shared<std::vector<triple>>();
             // Perform standard NOP-Join on partitions
-                    // TODO Dangerous Ownership semantics here, change in future update
-            std::shared_ptr<tuple[]> curr_l(left.get() + start_l);
-            std::shared_ptr<tuple[]> curr_r(left.get() + start_r);
-            nop_join join(curr_l, curr_r, end_l - start_l, end_r - start_r, table_size, result);
+            nop_join join(left + start_l, right + start_r, end_l - start_l, end_r - start_r, table_size, result);
             join.execute();
         }
     }

@@ -21,12 +21,12 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
 
         /// Basic constructor
-        radix_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r);
+        radix_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r);
         /// Join constructor with additional parameter
-        radix_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r,
+        radix_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
                  double table_size, uint8_t part_bits);
 
-        /// Performs the actual join and writes result
+        /// Performs the actual join and writes the result
         void execute();
 
         /// Returns a pointer to the result vector
@@ -35,9 +35,9 @@ namespace algorithms{
 
     private:
         /// Left join partner
-        std::shared_ptr<tuple[]> left;
+        tuple* left;
         /// Right join partner
-        std::shared_ptr<tuple[]> right;
+        tuple* right;
         /// Size of the left parameter
         uint64_t size_l;
         /// Size of the right parameter

@@ -21,12 +21,12 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
 
         /// Basic constructor
-        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r);
+        nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r);
         /// Join constructor with additional parameter
-        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right,
+        nop_join(tuple* left, tuple* right,
                  uint64_t size_l, uint64_t size_r, double table_size);
         /// Join constructor  offering maximum flexibility
-        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right,
+        nop_join(tuple* left, tuple* right,
                  uint64_t size_l, uint64_t size_r, double table_size, std::shared_ptr<std::vector<triple>> result);
 
         /// Performs the actual join and writes result
@@ -41,9 +41,9 @@ namespace algorithms{
 
     private:
         /// Left join partner
-        std::shared_ptr<tuple[]> left;
+        tuple* left;
         /// Right join partner
-        std::shared_ptr<tuple[]> right;
+        tuple* right;
         /// Size of the left array
         uint64_t size_l;
         /// Size of the right array

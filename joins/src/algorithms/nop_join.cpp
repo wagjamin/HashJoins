@@ -38,18 +38,15 @@ namespace algorithms{
 
     };
 
-    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right,
-                       uint64_t size_l, uint64_t size_r): nop_join(std::move(left), std::move(right),
-                                                                    size_l, size_r, 1.5){}
+    nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r):
+            nop_join(left, right, size_l, size_r, 1.5){}
 
-    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right,
-                       uint64_t size_l, uint64_t size_r, double table_size):
-            nop_join(std::move(left), std::move(right), size_l,
-                     size_r, table_size, std::make_shared<std::vector<triple>>()){}
+    nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r, double table_size):
+            nop_join(left, right, size_l, size_r, table_size, std::make_shared<std::vector<triple>>()){}
 
-    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r,
+    nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
                        double table_size, std::shared_ptr<std::vector<triple>> result):
-                                left(std::move(left)), right(std::move(right)), size_l(size_l), size_r(size_r),
+                                left(left), right(right), size_l(size_l), size_r(size_r),
                                 table_size(table_size), built(false), result(std::move(result)){}
 
     void nop_join::execute() {
@@ -57,7 +54,7 @@ namespace algorithms{
         hash_table table = hash_table(new_size);
         // Build Phase
         for(uint64_t k = 0; k < size_l; ++k){
-            tuple& curr = (left.get())[k];
+            tuple& curr = left[k];
             uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             switch(bucket.count){
@@ -84,7 +81,7 @@ namespace algorithms{
         // Probe Phase
         built = true;
         for(uint64_t k = 0; k < size_r; ++k){
-            tuple& curr = (right.get())[k];
+            tuple& curr = right[k];
             uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             // Follow overflow buckets

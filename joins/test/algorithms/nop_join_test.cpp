@@ -17,7 +17,7 @@ TEST(NopTest, CreationTester) {
     auto left = uni.get();
     uni.build();
     auto right = uni.get();
-    nop_join join(left, right, 1000, 1000, 1.5);
+    nop_join join(left.get(), right.get(), 1000, 1000, 1.5);
     ASSERT_ANY_THROW(join.get());
 }
 
@@ -35,7 +35,7 @@ TEST(NopTest, NoResTester) {
     gen.build();
     auto right = gen.get();
 
-    nop_join join(left, right, count, count, 1.5);
+    nop_join join(left.get(), right.get(), count, count, 1.5);
     join.execute();
     ASSERT_EQ((*join.get()).size(), 0);
 }
@@ -49,7 +49,7 @@ TEST(NopTest, CrossTester1) {
     uni = uniform_generator(1,1,1);
     uni.build();
     auto right = uni.get();
-    nop_join join(left, right, count, 1, 1.5);
+    nop_join join(left.get(), right.get(), count, 1, 1.5);
     join.execute();
     ASSERT_EQ((*join.get()).size(), count);
 }
@@ -63,7 +63,7 @@ TEST(NopTest, CrossTester2) {
     auto left = uni.get();
     uni.build();
     auto right = uni.get();
-    nop_join join(left, right, count, count, 1.5);
+    nop_join join(left.get(), right.get(), count, count, 1.5);
     join.execute();
     ASSERT_EQ((*join.get()).size(), count*count);
 }
@@ -78,7 +78,7 @@ TEST(NopTest, StatisticalTester){
     auto left = gen.get();
     gen.build();
     auto right = gen.get();
-    nop_join join(left, right, count, count);
+    nop_join join(left.get(), right.get(), count, count);
     join.execute();
     // Expected overall amount of join partners
     uint64_t expected = max * (count/max) * (count/max);
