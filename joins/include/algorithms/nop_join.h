@@ -21,13 +21,19 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
 
         /// Basic constructor
-        nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right);
+        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r);
         /// Join constructor with additional parameter
-        nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right,
-                 double table_size);
+        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right,
+                 uint64_t size_l, uint64_t size_r, double table_size);
+        /// Join constructor  offering maximum flexibility
+        nop_join(std::shared_ptr<tuple[]> left, std::shared_ptr<tuple[]> right,
+                 uint64_t size_l, uint64_t size_r, double table_size, std::shared_ptr<std::vector<triple>> result);
 
         /// Performs the actual join and writes result
         void execute();
+
+        /// Set the result vector into which data should be written
+        void set_res(std::shared_ptr<std::vector<triple>> res);
 
         /// Returns a pointer to the result vector
         std::shared_ptr<std::vector<triple>> get();
@@ -35,11 +41,17 @@ namespace algorithms{
 
     private:
         /// Left join partner
-        std::shared_ptr<std::vector<tuple>> left;
+        std::shared_ptr<tuple[]> left;
         /// Right join partner
-        std::shared_ptr<std::vector<tuple>> right;
+        std::shared_ptr<tuple[]> right;
+        /// Size of the left array
+        uint64_t size_l;
+        /// Size of the right array
+        uint64_t size_r;
         /// table_size*|left| is the size of the hash table being built
         double table_size;
+        /// Boolean flag indicating whether build was already called
+        bool built;
         /// Result vector
         std::shared_ptr<std::vector<triple>> result;
 

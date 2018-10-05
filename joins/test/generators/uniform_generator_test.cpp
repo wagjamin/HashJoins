@@ -19,9 +19,9 @@ TEST(UniGenTest, RangeTester) {
         uniform_generator gen(min, max, count);
         gen.build();
         auto vec = gen.get().get();
-        for(auto& curr: *vec){
-            ASSERT_GE(std::get<0>(curr), min);
-            ASSERT_LE(std::get<0>(curr), max);
+        for(uint64_t k = 0; k < count; k++){
+            ASSERT_GE(std::get<0>(vec[k]), min);
+            ASSERT_LE(std::get<0>(vec[k]), max);
         }
     }
 }
@@ -33,12 +33,12 @@ TEST(UniGenTest, DistTester) {
     auto count = static_cast<uint64_t>(1) << static_cast<uint64_t>(25);
     uniform_generator gen(min, max, count);
     gen.build();
-    // Create value historgram
+    // Create value histogram
     auto freq = std::make_unique<std::vector<uint64_t>>(max);
-    for(auto& item: *gen.get().get()){
-        (*freq)[std::get<0>(item) - 1]++;
+    for(uint64_t k = 0; k < gen.get_count(); ++k){
+        (*freq)[std::get<0>((gen.get())[k]) - 1]++;
     }
-    // Ensure that histogramm values fluctuate around mean
+    // Ensure that histogram values fluctuate around mean
     auto expected = static_cast<uint64_t>(count/max);
     for(auto& item: *freq){
         ASSERT_LE(static_cast<uint64_t>(0.95*expected), item);
@@ -51,9 +51,9 @@ TEST(UniGenTest, RIDTester){
     uniform_generator gen(0, 10, static_cast<uint64_t>(1) << static_cast<uint64_t>(22));
     gen.build();
     std::unordered_set<uint64_t> my_set = std::unordered_set<uint64_t>();
-    for(auto& item: *gen.get().get()){
-        ASSERT_EQ(my_set.find(std::get<1>(item)), my_set.end());
-        my_set.insert(std::get<1>(item));
+    for(uint64_t k = 0; k < gen.get_count(); ++k){
+        ASSERT_EQ(my_set.find(std::get<1>((gen.get())[k])), my_set.end());
+        my_set.insert(std::get<1>((gen.get())[k]));
     }
 }
 

@@ -38,17 +38,26 @@ namespace algorithms{
 
     };
 
-    nop_join::nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right):
-       nop_join(std::move(left), std::move(right), 1.5){}
+    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right,
+                       uint64_t size_l, uint64_t size_r): nop_join(std::move(left), std::move(right),
+                                                                    size_l, size_r, 1.5){}
 
-    nop_join::nop_join(std::shared_ptr<std::vector<tuple>> left, std::shared_ptr<std::vector<tuple>> right, double table_size):
-            left(std::move(left)), right(std::move(right)), table_size(table_size), result() {}
+    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right,
+                       uint64_t size_l, uint64_t size_r, double table_size):
+            nop_join(std::move(left), std::move(right), size_l,
+                     size_r, table_size, std::make_shared<std::vector<triple>>()){}
+
+    nop_join::nop_join(std::shared_ptr<nop_join::tuple[]> left, std::shared_ptr<tuple[]> right, uint64_t size_l, uint64_t size_r,
+                       double table_size, std::shared_ptr<std::vector<triple>> result):
+                                left(std::move(left)), right(std::move(right)), size_l(size_l), size_r(size_r),
+                                table_size(table_size), built(false), result(std::move(result)){}
 
     void nop_join::execute() {
-        auto new_size = static_cast<uint64_t>(1.5 * (*left).size());
+        auto new_size = static_cast<uint64_t>(1.5 * size_l);
         hash_table table = hash_table(new_size);
         // Build Phase
-        for(tuple& curr: *left){
+        for(uint64_t k = 0; k < size_l; ++k){
+            tuple& curr = (left.get())[k];
             uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             switch(bucket.count){
@@ -73,9 +82,9 @@ namespace algorithms{
             ++bucket.count;
         }
         // Probe Phase
-        // Initialize result array
-        result = std::make_shared<std::vector<triple>>();
-        for(tuple& curr: *right){
+        built = true;
+        for(uint64_t k = 0; k < size_r; ++k){
+            tuple& curr = (right.get())[k];
             uint64_t index = std::get<0>(curr) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             // Follow overflow buckets
@@ -99,8 +108,12 @@ namespace algorithms{
         }
     }
 
+    void nop_join::set_res(std::shared_ptr<std::vector<algorithms::nop_join::triple>> res) {
+        result = std::move(res);
+    }
+
     std::shared_ptr<std::vector<nop_join::triple>> nop_join::get() {
-        if(result == nullptr){
+        if(!built){
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;

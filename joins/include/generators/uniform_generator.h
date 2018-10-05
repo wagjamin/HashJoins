@@ -13,7 +13,7 @@ namespace generators{
 
     /**
      * Generates uniformly distributed data within a certain range.
-     * Then returns a vector of tuples where the keys follow the given
+     * Then returns an array of tuples where the keys follow the given
      * distribution.
      * The RIDs are guaranteed to be unique within the whole dataset, but
      * do not follow a certain distribution (since they are not relevant
@@ -31,12 +31,14 @@ namespace generators{
          */
         void build();
         /**
-         * Returns a shared vector containing the generated data.
+         * Returns a shared array containing the generated data.
          * May not be called without previous call to build.
          * The first tuple element contains the values following the distribution, the
          * second tuple element contains the RID.
          */
-        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> get();
+        std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> get();
+        /// Return the number of elements generated
+        uint64_t get_count();
 
         /// Member-wise copy and move is fine
         ~uniform_generator() = default;
@@ -49,7 +51,7 @@ namespace generators{
         uint64_t min;
         uint64_t max;
         size_t count;
-        std::shared_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> data;
+        std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> data;
     };
 
 } // namespace generators
