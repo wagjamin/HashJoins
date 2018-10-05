@@ -10,12 +10,32 @@ namespace algorithms{
     /// Simple linear probing hash table
     struct radix_join::hash_table{
 
-        uint64_t size;
-        std::unique_ptr<tuple[]> arr;
+        /// One of the hash table entries
+        struct bucket{
 
-        explicit hash_table(uint64_t size): size(size){
-            arr = std::make_unique<tuple[]>(size);
+            /// Overflow bucket used for chaining
+            struct overflow{
+                tuple t;
+                std::unique_ptr<overflow> next;
+
+                overflow(tuple t): t(t){}
+            };
+
+            uint32_t count;
+            tuple t1;
+            tuple t2;
+            std::unique_ptr<overflow> next;
+
+            /// Default constructor
+            bucket(): count(0), next(nullptr) {}
+
         };
+
+        std::unique_ptr<bucket[]> arr;
+
+        explicit hash_table(uint64_t size){
+            arr = std::make_unique<bucket[]>(size);
+        }
 
     };
 
@@ -29,7 +49,11 @@ namespace algorithms{
                                                part_count(static_cast<uint32_t>(1) << part_bits) {
     };
 
-    inline uint64_t radix_join::hash(uint64_t val) {
+    inline uint64_t radix_join::hash1(uint64_t val) {
+        return val;
+    }
+
+    uint64_t radix_join::hash2(uint64_t val) {
         return val;
     }
 
@@ -39,7 +63,7 @@ namespace algorithms{
         uint64_t pattern = part_count - 1;
         // Create histogram of the hash values
         for(uint64_t i = 0; i < count; ++i){
-            uint64_t index = (hash(std::get<0>(data_s[pattern])) & pattern);
+            uint64_t index = (hash1(std::get<0>(data_s[pattern])) & pattern);
             hist[index]++;
         }
         // Build prefix sum
@@ -48,7 +72,7 @@ namespace algorithms{
         }
         // Scatter tuples into destination
         for(uint64_t i = 0; i < count; ++i){
-            uint64_t index = (hash(std::get<0>(data_s[i])) & pattern);
+            uint64_t index = (hash1(std::get<0>(data_s[i])) & pattern);
             uint64_t write_to = hist[index]++;
             data_t[write_to] = std::move(data_s[i]);
         }
@@ -78,8 +102,56 @@ namespace algorithms{
             // Read partition ends from histogram
             end_l = (*hist_l)[part];
             end_r = (*hist_r)[part];
-            hash_table table(static_cast<uint64_t>((end_l - start_l) * table_size));
-            
+            auto new_size = static_cast<uint64_t>((end_l - start_l) * table_size);
+            hash_table table(new_size);
+            // TODO Major Refactor to enable use of NOP-Join here ?
+            for(uint64_t i = start_l; i < end_l; ++i){
+                tuple& curr = (*list_l)[i];
+                uint64_t index = hash2(std::get<0>(curr)) % new_size;
+                hash_table::bucket& bucket = table.arr[index];
+                // Follow overflow buckets
+                if(bucket.count > 2){
+                    hash_table::bucket::overflow* curr_over = bucket.next.get();
+                    for(uint64_t k = 0; k < static_cast<uint64_t>(bucket.count - 2); ++k){
+                        if(std::get<0>(curr_over->t) == std::get<0>(curr)){
+                            result->push_back({std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr)});
+                        }
+                        curr_over = curr_over->next.get();
+                    }
+                }
+                // Look at second tuple
+                if(bucket.count > 1 && std::get<0>(bucket.t2) == std::get<0>(curr)){
+                    result->push_back({std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr)});
+                }
+                // Look at first tuple
+                if(bucket.count > 0 && std::get<0>(bucket.t1) == std::get<0>(curr)){
+                    result->push_back({std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr)});
+                }
+            }
+            result = std::make_shared<std::vector<triple>>();
+            for(uint64_t i = start_r; i < end_r; ++i){
+                tuple& curr = (*list_r)[i];
+                uint64_t index = hash2(std::get<0>(curr)) % new_size;
+                hash_table::bucket& bucket = table.arr[index];
+                // Follow overflow buckets
+                if(bucket.count > 2){
+                    hash_table::bucket::overflow* curr_over = bucket.next.get();
+                    for(uint64_t k = 0; k < static_cast<uint64_t>(bucket.count - 2); ++k){
+                        if(std::get<0>(curr_over->t) == std::get<0>(curr)){
+                            result->push_back({std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr)});
+                        }
+                        curr_over = curr_over->next.get();
+                    }
+                }
+                // Look at second tuple
+                if(bucket.count > 1 && std::get<0>(bucket.t2) == std::get<0>(curr)){
+                    result->push_back({std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr)});
+                }
+                // Look at first tuple
+                if(bucket.count > 0 && std::get<0>(bucket.t1) == std::get<0>(curr)){
+                    result->push_back({std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr)});
+                }
+            }
         }
     }
 

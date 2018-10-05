@@ -47,7 +47,11 @@ namespace algorithms{
         /// Result vector
         std::shared_ptr<std::vector<triple>> result;
 
-        inline uint64_t hash(uint64_t val);
+        /// Hash function used for radix partitioning
+        inline uint64_t hash1(uint64_t val);
+        /// Hash function used for building
+        inline uint64_t hash2(uint64_t val);
+
         /**
          * Partition parts of the data
          * @param data_s    beginning of the data to be partitioned
