@@ -53,8 +53,6 @@ namespace algorithms{
 
         /// Hash function used for radix partitioning
         inline uint64_t hash1(uint64_t val);
-        /// Hash function used for building
-        inline uint64_t hash2(uint64_t val);
 
         /**
          * Partition parts of the data

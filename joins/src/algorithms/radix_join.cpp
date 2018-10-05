@@ -5,6 +5,7 @@
 #include "algorithms/radix_join.h"
 #include "algorithms/nop_join.h"
 #include <utility>
+#include <iostream>
 
 namespace algorithms{
 
@@ -21,12 +22,7 @@ namespace algorithms{
         return val;
     }
 
-    uint64_t radix_join::hash2(uint64_t val) {
-        return val;
-    }
-
-    void radix_join::partition(tuple* data_s, tuple* data_t,
-                               uint64_t* hist, uint64_t count) {
+    void radix_join::partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count) {
         // Pattern filtering the bits we are looking at
         uint64_t pattern = part_count - 1;
         // Create histogram of the hash values
@@ -36,6 +32,7 @@ namespace algorithms{
         }
         // Build prefix sum
         uint64_t sum = hist[0];
+        hist[0] = 0;
         for(uint64_t part = 1; part < part_count; ++part){
             uint64_t temp = hist[part];
             hist[part] = sum;
@@ -45,7 +42,7 @@ namespace algorithms{
         for(uint64_t i = 0; i < count; ++i){
             uint64_t index = (hash1(std::get<0>(data_s[i])) & pattern);
             uint64_t write_to = hist[index]++;
-            data_t[write_to] = std::move(data_s[i]);
+            data_t[write_to] = data_s[i];
         }
     }
 
@@ -58,7 +55,11 @@ namespace algorithms{
         std::unique_ptr<tuple[]> list_r(new tuple[size_r]);
         auto hist_r = std::make_unique<uint64_t[]>(part_count);
         partition(right, list_r.get(), hist_r.get(), size_r);
+        for(uint32_t part = 0; part < part_count; ++part){
+            std::cout << hist_l[part] << ";" << hist_r[part] << "\n";
+        }
         // Join the separate partitions
+        result = std::make_shared<std::vector<triple>>();
         for(uint32_t part = 0; part < part_count; ++part){
             uint64_t start_l, start_r, end_l, end_r;
             if(part == 0){
@@ -73,10 +74,12 @@ namespace algorithms{
             // Read partition ends from histogram
             end_l = hist_l[part];
             end_r = hist_r[part];
-            result = std::make_shared<std::vector<triple>>();
             // Perform standard NOP-Join on partitions
-            nop_join join(left + start_l, right + start_r, end_l - start_l, end_r - start_r, table_size, result);
-            join.execute();
+            if(start_l != end_l && start_r != end_r){
+                nop_join join(list_l.get() + start_l, list_r.get() + start_r, end_l - start_l,
+                              end_r - start_r, table_size, result);
+                join.execute();
+            }
         }
     }
 

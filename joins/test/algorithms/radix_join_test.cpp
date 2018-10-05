@@ -78,7 +78,7 @@ TEST(RadTest, StatisticalTester){
     auto left = gen.get();
     gen.build();
     auto right = gen.get();
-    radix_join join(left.get(), right.get(), count, count);
+    radix_join join(left.get(), right.get(), count, count, 1.5, 6);
     join.execute();
     // Expected overall amount of join partners
     uint64_t expected = max * (count/max) * (count/max);
