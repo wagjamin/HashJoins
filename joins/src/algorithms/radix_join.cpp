@@ -5,7 +5,6 @@
 #include "algorithms/radix_join.h"
 #include "algorithms/nop_join.h"
 #include <utility>
-#include <iostream>
 
 namespace algorithms{
 
@@ -55,9 +54,6 @@ namespace algorithms{
         std::unique_ptr<tuple[]> list_r(new tuple[size_r]);
         auto hist_r = std::make_unique<uint64_t[]>(part_count);
         partition(right, list_r.get(), hist_r.get(), size_r);
-        for(uint32_t part = 0; part < part_count; ++part){
-            std::cout << hist_l[part] << ";" << hist_r[part] << "\n";
-        }
         // Join the separate partitions
         result = std::make_shared<std::vector<triple>>();
         for(uint32_t part = 0; part < part_count; ++part){

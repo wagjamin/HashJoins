@@ -5,6 +5,8 @@
 #include "generators/uniform_generator.h"
 #include "algorithms/radix_join.h"
 #include "gtest/gtest.h"
+#include <iostream>
+#include <chrono>
 
 using namespace generators;  // NOLINT
 using namespace algorithms; // NOLINT
@@ -70,18 +72,22 @@ TEST(RadTest, CrossTester2) {
 
 // Statistical test, usually should not fail
 TEST(RadTest, StatisticalTester){
-    uint64_t count = static_cast<uint64_t>(1) << static_cast<uint64_t>(16);
+    uint64_t count = static_cast<uint64_t>(1) << static_cast<uint64_t>(17);
     uint64_t min = 1;
-    uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(10);
+    uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
     auto left = gen.get();
     gen.build();
     auto right = gen.get();
-    radix_join join(left.get(), right.get(), count, count, 1.5, 6);
+    radix_join join(left.get(), right.get(), count, count, 1.5, 7);
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>( t2 - t1 ).count();
+    std::cout << "Join Time: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
-    uint64_t expected = max * (count/max) * (count/max);
+    auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
     ASSERT_LE(0.95 * expected, (*join.get()).size());
     ASSERT_GE(1.05 * expected, (*join.get()).size());
 }
