@@ -58,7 +58,26 @@ namespace algorithms{
         /// Result vector
         std::shared_ptr<std::vector<triple>> result;
 
+        /// Private minimal hash table implementation
         struct hash_table;
+
+        /**
+         * Builds a fraction of the left table, used in multi threaded setting
+         * @param start   start index of the section of the left table that should be built (inclusive)
+         * @param end     end index of the section of the left table that should be built (exclusive)
+         */
+        void build(uint64_t start, uint64_t end, hash_table* table);
+
+        /**
+         * Probes with a fraction of the right table, used in multi threaded setting
+         * @param start   start index of the section of the right table that should be probed with (inclusive)
+         * @param end     end index of the section of the right table that should be probed with (exclusive)
+         */
+        void probe(uint64_t start, uint64_t end, hash_table* table);
+
+        /// Hash function used for build process
+        inline uint64_t hash(uint64_t val);
+
 
     };
 
