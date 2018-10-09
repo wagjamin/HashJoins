@@ -48,10 +48,11 @@ namespace algorithms{
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l,
                              uint64_t size_r, double table_size, uint8_t threads):
-            nop_join_mt(left, right, size_l, size_r, table_size, threads, std::make_shared<std::vector<triple>>()){}
+            nop_join_mt(left, right, size_l, size_r, table_size, threads,
+                        std::make_shared<std::vector<std::vector<triple>>>()){}
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
-                       double table_size, uint8_t threads, std::shared_ptr<std::vector<triple>> result):
+                       double table_size, uint8_t threads, std::shared_ptr<std::vector<std::vector<triple>>> result):
             left(left), right(right), size_l(size_l), size_r(size_r),
             table_size(table_size), threads(threads), built(false), result(std::move(result)){}
 
@@ -63,26 +64,38 @@ namespace algorithms{
         std::thread arr[threads];
         // Start all threads except for the final one
         for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
-            arr[curr_t] = std::thread(&nop_join_mt::build, curr_t * offset, (curr_t + 1) * offset, &table);
+            //TODO is passing this here evil?
+            arr[curr_t] = std::thread(&nop_join_mt::build, this, curr_t * offset, (curr_t + 1) * offset, &table);
         }
         // Start final thread
-        arr[threads - 1] = std::thread(&nop_join_mt::build, (threads - 1) * offset, size_l, &table);
+        arr[threads - 1] = std::thread(&nop_join_mt::build, this,(threads - 1) * offset, size_l, &table);
         // Join threads again, afterwards build phase is done
         for(uint8_t curr_t = 0; curr_t < threads; ++curr_t){
             arr[curr_t].join();
         }
         // Probe Phase:
+        offset = size_r/threads;
+        std::thread arr2[threads];
+        for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
+            arr2[curr_t] = std::thread(&nop_join_mt::probe, this, curr_t * offset, (curr_t + 1) * offset, &table);
+        }
+        // Start final thread
+        arr[threads - 1] = std::thread(&nop_join_mt::probe, this,(threads - 1) * offset, size_l, &table);
+        // Join threads again, afterwards probe phase is done as well
+        for(uint8_t curr_t = 0; curr_t < threads; ++curr_t){
+            arr[curr_t].join();
+        }
     }
 
     void nop_join_mt::build(uint64_t start, uint64_t end, hash_table* table) {
-        for(uint64_t k = start; k < end; ++k){
-            tuple& curr = left[k];
+        for(uint64_t k = start; k < end; ++k) {
+            tuple &curr = left[k];
             uint64_t index = std::get<0>(curr) % table->size;
-            hash_table::bucket& bucket = (*table).arr[index];
+            hash_table::bucket &bucket = (*table).arr[index];
             // Critical Section
             bucket.lock.lock();
             // Follow overflow buckets
-            switch(bucket.count){
+            switch (bucket.count) {
                 case 0:
                     bucket.t1 = curr;
                     break;
@@ -93,9 +106,9 @@ namespace algorithms{
                     bucket.next = std::make_unique<hash_table::bucket::overflow>(curr);
                     break;
                 default:
-                    hash_table::bucket::overflow* ptr = bucket.next.get();
+                    hash_table::bucket::overflow *ptr = bucket.next.get();
                     // Follow pointer indirection
-                    for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 3); i++){
+                    for (uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 3); i++) {
                         ptr = ptr->next.get();
                     }
                     // Create new bucket containing tuple
