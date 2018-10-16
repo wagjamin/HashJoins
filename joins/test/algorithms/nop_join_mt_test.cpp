@@ -177,7 +177,7 @@ TEST(NopTestMT, StatisticalTesterMT){
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( t2 - t1 ).count();
-    std::cout << "MT NOP Join Time Single Threaded: " << duration << " milliseconds.\n";
+    std::cout << "MT NOP Join Time Multi Threaded: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
     ASSERT_LE(0.95 * expected, get_size(join.get().get()));
