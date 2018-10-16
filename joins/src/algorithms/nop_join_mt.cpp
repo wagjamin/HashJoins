@@ -62,32 +62,32 @@ namespace algorithms{
         // Build Phase:
         // Chunk size per thread
         uint64_t offset = size_l/threads;
-        std::thread arr[threads];
+        std::vector<std::thread> thread_vec{};
         // Start all threads except for the final one
         for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
-            arr[curr_t] = std::thread(&nop_join_mt::build, this, curr_t * offset, (curr_t + 1) * offset, &table);
+            thread_vec.emplace_back(&nop_join_mt::build, this, curr_t * offset, (curr_t + 1) * offset, &table);
         }
         // Start final thread
-        arr[threads - 1] = std::thread(&nop_join_mt::build, this,(threads - 1) * offset, size_l, &table);
+        thread_vec.emplace_back(&nop_join_mt::build, this,(threads - 1) * offset, size_l, &table);
         // Join threads again, afterwards build phase is done
         for(uint8_t curr_t = 0; curr_t < threads; ++curr_t){
-            arr[curr_t].join();
+            thread_vec[curr_t].join();
         }
         // Probe Phase:
+        std::vector<std::thread> thread_vec2{};
         offset = size_r/threads;
-        std::thread arr2[threads];
         for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
             result->push_back(std::vector<triple>());
-            arr2[curr_t] = std::thread(&nop_join_mt::probe, this, curr_t * offset,
+            thread_vec2.emplace_back(&nop_join_mt::probe, this, curr_t * offset,
                     (curr_t + 1) * offset, &table, &(*result)[curr_t]);
         }
         // Start final thread
         result->push_back(std::vector<triple>());
-        arr[threads - 1] = std::thread(&nop_join_mt::probe, this,(threads - 1) * offset, size_l,
+        thread_vec2.emplace_back(&nop_join_mt::probe, this,(threads - 1) * offset, size_r,
                 &table, &(*result)[threads - 1]);
         // Join threads again, afterwards probe phase is done as well
         for(uint8_t curr_t = 0; curr_t < threads; ++curr_t){
-            arr[curr_t].join();
+            thread_vec2[curr_t].join();
         }
     }
 
