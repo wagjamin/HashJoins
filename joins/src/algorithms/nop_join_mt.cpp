@@ -57,6 +57,7 @@ namespace algorithms{
             table_size(table_size), threads(threads), built(false), result(std::move(result)){}
 
     void nop_join_mt::execute() {
+        built = true;
         hash_table table(static_cast<uint64_t>(table_size * size_l));
         // Build Phase:
         // Chunk size per thread
@@ -64,7 +65,6 @@ namespace algorithms{
         std::thread arr[threads];
         // Start all threads except for the final one
         for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
-            //TODO is passing this here evil?
             arr[curr_t] = std::thread(&nop_join_mt::build, this, curr_t * offset, (curr_t + 1) * offset, &table);
         }
         // Start final thread
@@ -77,10 +77,14 @@ namespace algorithms{
         offset = size_r/threads;
         std::thread arr2[threads];
         for(uint8_t curr_t = 0; curr_t < threads - 1; ++curr_t){
-            arr2[curr_t] = std::thread(&nop_join_mt::probe, this, curr_t * offset, (curr_t + 1) * offset, &table);
+            result->push_back(std::vector<triple>());
+            arr2[curr_t] = std::thread(&nop_join_mt::probe, this, curr_t * offset,
+                    (curr_t + 1) * offset, &table, &(*result)[curr_t]);
         }
         // Start final thread
-        arr[threads - 1] = std::thread(&nop_join_mt::probe, this,(threads - 1) * offset, size_l, &table);
+        result->push_back(std::vector<triple>());
+        arr[threads - 1] = std::thread(&nop_join_mt::probe, this,(threads - 1) * offset, size_l,
+                &table, &(*result)[threads - 1]);
         // Join threads again, afterwards probe phase is done as well
         for(uint8_t curr_t = 0; curr_t < threads; ++curr_t){
             arr[curr_t].join();
@@ -91,7 +95,7 @@ namespace algorithms{
         for(uint64_t k = start; k < end; ++k) {
             tuple &curr = left[k];
             uint64_t index = std::get<0>(curr) % table->size;
-            hash_table::bucket &bucket = (*table).arr[index];
+            hash_table::bucket &bucket = table->arr[index];
             // Critical Section
             bucket.lock.lock();
             // Follow overflow buckets
@@ -119,12 +123,41 @@ namespace algorithms{
         }
     }
 
-    void nop_join_mt::probe(uint64_t start, uint64_t end, hash_table* table) {
-
+    void nop_join_mt::probe(uint64_t start, uint64_t end, hash_table* table, std::vector<triple>* result) {
+        for(uint64_t k = start; k < end; ++k){
+            tuple& curr = right[k];
+            uint64_t index = std::get<0>(curr) % table->size;
+            hash_table::bucket& bucket = table->arr[index];
+            // Follow overflow buckets
+            if(bucket.count > 2){
+                hash_table::bucket::overflow* curr_over = bucket.next.get();
+                for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 2); ++i){
+                    if(std::get<0>(curr_over->t) == std::get<0>(curr)){
+                        result->emplace_back(std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr));
+                    }
+                    curr_over = curr_over->next.get();
+                }
+            }
+            // Look at second tuple
+            if(bucket.count > 1 && std::get<0>(bucket.t2) == std::get<0>(curr)){
+                result->emplace_back(std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr));
+            }
+            // Look at first tuple
+            if(bucket.count > 0 && std::get<0>(bucket.t1) == std::get<0>(curr)){
+                result->emplace_back(std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr));
+            }
+        }
     }
 
     inline uint64_t nop_join_mt::hash(uint64_t val) {
         return val;
+    }
+
+    std::shared_ptr<std::vector<std::vector<nop_join_mt::triple>>> nop_join_mt::get(){
+        if(!built){
+            throw std::logic_error("Join must be performed before querying results.");
+        }
+        return result;
     }
 
 } // namespace algorithms

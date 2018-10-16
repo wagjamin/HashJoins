@@ -73,7 +73,7 @@ namespace algorithms{
          * @param start   start index of the section of the right table that should be probed with (inclusive)
          * @param end     end index of the section of the right table that should be probed with (exclusive)
          */
-        void probe(uint64_t start, uint64_t end, hash_table* table);
+        void probe(uint64_t start, uint64_t end, hash_table* table, std::vector<triple>* result);
 
         /// Hash function used for build process
         inline uint64_t hash(uint64_t val);
