@@ -72,8 +72,10 @@ namespace algorithms{
          * Probes with a fraction of the right table, used in multi threaded setting
          * @param start   start index of the section of the right table that should be probed with (inclusive)
          * @param end     end index of the section of the right table that should be probed with (exclusive)
+         * @param table   pointer to the hash table used for probing
+         * @param t_num   thread index needed for output coordination
          */
-        void probe(uint64_t start, uint64_t end, hash_table* table, std::vector<triple>* result);
+        void probe(uint64_t start, uint64_t end, hash_table* table, uint8_t t_num);
 
         /// Hash function used for build process
         inline uint64_t hash(uint64_t val);
