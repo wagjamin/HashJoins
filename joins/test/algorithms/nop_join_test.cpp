@@ -7,7 +7,6 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <chrono>
-
 using namespace generators;  // NOLINT
 using namespace algorithms; // NOLINT
 
