@@ -44,17 +44,20 @@ namespace algorithms{
     };
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r):
-            nop_join_mt(left, right, size_l, size_r, 1.5, 4){}
+            nop_join_mt(left, right, size_l, size_r, 1.5, 4)
+    {}
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l,
                              uint64_t size_r, double table_size, uint8_t threads):
             nop_join_mt(left, right, size_l, size_r, table_size, threads,
-                        std::make_shared<std::vector<std::vector<triple>>>(threads)){}
+                        std::make_shared<std::vector<std::vector<triple>>>(threads))
+    {}
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
                        double table_size, uint8_t threads, std::shared_ptr<std::vector<std::vector<triple>>> result):
             left(left), right(right), size_l(size_l), size_r(size_r),
-            table_size(table_size), threads(threads), built(false), result(std::move(result)){}
+            table_size(table_size), threads(threads), built(false), result(std::move(result))
+    {}
 
     void nop_join_mt::execute() {
         built = true;
