@@ -2,7 +2,9 @@
 // Created by benjamin on 21.10.18.
 //
 
+#include <algorithms/nop_join_mt.h>
 #include "algorithms/mt_radix/radix_tasks.h"
+#include "algorithms/nop_join.h"
 
 namespace algorithms{
 
@@ -105,6 +107,17 @@ namespace algorithms{
         if(spawn){
             // TODO
         }
+    }
+
+    // Constructor of the build/probe phase
+    join_task::join_task(task_context& context, tuple *data_l, tuple *data_r, uint64_t size_l, uint64_t size_r,
+                         std::shared_ptr<std::vector<triple>> output):
+            task(context), data_l(data_l), data_r(data_r), size_l(size_l), size_r(size_r), output(std::move(output)){}
+
+    void join_task::operator()() {
+        // Run a simple no partitioning join on the given data
+        nop_join join(data_l, data_r, size_l, size_r, context.table_size, output);
+        join.execute();
     }
 
 } // namespace algorithms

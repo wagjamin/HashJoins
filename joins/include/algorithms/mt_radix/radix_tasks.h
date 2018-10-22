@@ -89,8 +89,18 @@ namespace algorithms{
 
     /// Performs the actual join on given data
     struct join_task: task{
-        // TODO
 
+        join_task(task_context& context, tuple* data_l, tuple* data_r, uint64_t size_l, uint64_t size_r,
+                  std::shared_ptr<std::vector<triple>> output);
+
+        /// Pointer to the data which has to be joined
+        tuple *data_l, *data_r;
+        /// Size of the data which has to be joined
+        uint64_t size_l, size_r;
+        /// Output vector
+        std::shared_ptr<std::vector<triple>> output;
+
+        void operator()();
     };
 
 } // namespace algorithms
