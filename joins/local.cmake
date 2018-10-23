@@ -7,8 +7,9 @@ set(SRC_LIB_EXAMPLE_H
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/radix_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join_mt.h"
-        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/radix_join_mt.h"
+        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/mt_radix/radix_join_mt.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/mt_radix/radix_tasks.h"
+        "${CMAKE_SOURCE_DIR}/joins/lib/ThreadPool.h"
         "${CMAKE_SOURCE_DIR}/joins/include/generators/uniform_generator.h"
     )
 
@@ -18,7 +19,7 @@ set(SRC_LIB_EXAMPLE_CC
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/radix_join.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join_mt.cpp"
-        "${CMAKE_SOURCE_DIR}/joins/src/algorithms/radix_join_mt.cpp"
+        "${CMAKE_SOURCE_DIR}/joins/src/algorithms/mt_radix/radix_join_mt.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/mt_radix/radix_tasks.cpp"
     )
 
@@ -39,7 +40,8 @@ add_library(example STATIC ${SRC_LIB_EXAMPLE_CC})
 
 target_compile_options(example PUBLIC -Werror)
 target_include_directories(example PUBLIC
-    "${CMAKE_SOURCE_DIR}/joins/include")
+    "${CMAKE_SOURCE_DIR}/joins/include"
+        "${CMAKE_SOURCE_DIR}/joins/lib")
 target_link_libraries(example
     Threads::Threads
     )

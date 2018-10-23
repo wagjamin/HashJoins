@@ -22,7 +22,6 @@ namespace algorithms{
                 overflow(tuple t): t(t){}
             };
 
-            // TODO Lightweight CMP SWP lock in the future
             std::mutex lock;
             uint32_t count;
             tuple t1;
