@@ -6,6 +6,7 @@
 #include "algorithms/mt_radix/radix_tasks.h"
 #include <utility>
 #include <future>
+#include <iostream>
 
 namespace algorithms{
 
@@ -58,7 +59,6 @@ namespace algorithms{
         for(uint8_t k = 0; k < threads; ++k){
             res[k] = vec[k].get();
         }
-
         // The following code builds history and prefix sums
         uint64_t part_count = (static_cast<uint64_t>(1) << static_cast<uint64_t>(bits_per_pass));
         // Global histogram
@@ -108,7 +108,7 @@ namespace algorithms{
             scatter_vec[k] = pool.enqueue(scatter_task::execute, &context, false, 1, local_l, local_r,
                     left + (k*range_l), right + (k*range_r), range_l, range_r, target_l.get(), target_r.get());
             // Update the sum vectors with thread's histogram data
-            for(uint8_t j = 0; j < part_count; ++j){
+            for(uint64_t j = 0; j < part_count; ++j){
                 localsum_l[j] += (*(res[k]).first)[j];
                 localsum_r[j] += (*(res[k]).second)[j];
             }
@@ -127,7 +127,7 @@ namespace algorithms{
         if(passes == 1){
             // Schedule partition tasks
             for(uint64_t k = 0; k < part_count; ++k){
-                pool.enqueue(join_task::execute, &context, left + sum_l[k], right + sum_r[k], hist_l[k], hist_r[k]);
+                pool.enqueue(join_task::execute, &context, target_l.get() + sum_l[k], target_r.get() + sum_r[k], hist_l[k], hist_r[k]);
             }
         }
         // We have to perform more partitions and scatters

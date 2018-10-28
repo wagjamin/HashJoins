@@ -8,6 +8,9 @@
 #include <iostream>
 #include <chrono>
 
+// Number of threads the program should be run on
+#define thread_count 4
+
 using namespace generators;  // NOLINT
 using namespace algorithms; // NOLINT
 
@@ -22,9 +25,6 @@ uint64_t get_size(std::vector<std::vector<nop_join_mt::triple>>* output){
     }
     return size;
 }
-
-// Variable indicating the amount of threads the multi-threaded tests should run on
-uint8_t thread_count = 4;
 
 // Ensure proper creation of object and no return before execution
 TEST(NopTestMT, CreationTesterST) {

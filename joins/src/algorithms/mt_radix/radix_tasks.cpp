@@ -3,7 +3,6 @@
 //
 #include "algorithms/mt_radix/radix_tasks.h"
 #include "algorithms/nop_join.h"
-#include <iostream>
 
 namespace algorithms{
 
