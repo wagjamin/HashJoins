@@ -30,6 +30,7 @@ set(TEST_LIB_EXAMPLE_CC
         "${CMAKE_SOURCE_DIR}/joins/test/algorithms/nop_join_test.cpp"
         "${CMAKE_SOURCE_DIR}/joins/test/algorithms/nop_join_mt_test.cpp"
         "${CMAKE_SOURCE_DIR}/joins/test/algorithms/radix_join_test.cpp"
+        "${CMAKE_SOURCE_DIR}/joins/test/algorithms/radix_join_mt_test.cpp"
     )
 
 # ---------------------------------------------------------------------------

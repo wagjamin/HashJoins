@@ -25,11 +25,6 @@ namespace algorithms{
         /// Join constructor with additional parameter
         nop_join_mt(tuple* left, tuple* right,
                 uint64_t size_l, uint64_t size_r, double table_size, uint8_t threads);
-        /// Join constructor  offering maximum flexibility
-        nop_join_mt(tuple* left, tuple* right,
-                uint64_t size_l, uint64_t size_r, double table_size, uint8_t threads,
-                    std::shared_ptr<std::vector<std::vector<triple>>> result);
-
         /// Performs the actual join and writes result
         void execute();
 

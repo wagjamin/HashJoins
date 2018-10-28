@@ -48,17 +48,17 @@ namespace algorithms{
 
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l,
                              uint64_t size_r, double table_size, uint8_t threads):
-            nop_join_mt(left, right, size_l, size_r, table_size, threads,
-                        std::make_shared<std::vector<std::vector<triple>>>(threads))
-    {}
-
-    nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
-                       double table_size, uint8_t threads, std::shared_ptr<std::vector<std::vector<triple>>> result):
             left(left), right(right), size_l(size_l), size_r(size_r),
-            table_size(table_size), threads(threads), built(false), result(std::move(result))
+            table_size(table_size), threads(threads), built(false),
+            result(std::make_shared<std::vector<std::vector<triple>>>(threads))
     {}
 
     void nop_join_mt::execute() {
+        // No results on empty datasets
+        if(size_l == 0 || size_r == 0){
+            built = true;
+            return;
+        }
         built = true;
         hash_table table(static_cast<uint64_t>(table_size * size_l));
         // Build Phase:

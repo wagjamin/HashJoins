@@ -46,6 +46,11 @@ namespace algorithms{
     }
 
     void radix_join::execute() {
+        result = std::make_shared<std::vector<triple>>();
+        // No results on empty datasets
+        if(size_l == 0 || size_r == 0){
+            return;
+        }
         // Partition left side
         std::unique_ptr<tuple[]> list_l(new tuple[size_l]);
         auto hist_l = std::make_unique<uint64_t[]>(part_count);
@@ -55,7 +60,6 @@ namespace algorithms{
         auto hist_r = std::make_unique<uint64_t[]>(part_count);
         partition(right, list_r.get(), hist_r.get(), size_r);
         // Join the separate partitions
-        result = std::make_shared<std::vector<triple>>();
         for(uint32_t part = 0; part < part_count; ++part){
             uint64_t start_l, start_r, end_l, end_r;
             if(part == 0){

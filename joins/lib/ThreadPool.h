@@ -1,5 +1,5 @@
 /*
-Thread Pool implementation: https://github.com/progschj/ThreadPool
+SLightly modified thread Pool implementation: https://github.com/progschj/ThreadPool
 
 Copyright (c) 2012 Jakob Progsch, Václav Zeman
 
@@ -20,7 +20,7 @@ freely, subject to the following restrictions:
    misrepresented as being the original software.
 
    3. This notice may not be removed or altered from any source
-distribution.
+   distribution.
  */
 
 #ifndef THREAD_POOL_H
@@ -42,7 +42,7 @@ public:
     template<class F, class... Args>
     auto enqueue(F&& f, Args&&... args)
     -> std::future<typename std::result_of<F(Args...)>::type>;
-    ~ThreadPool();
+    void finish();
 private:
     // need to keep track of threads so we can join them
     std::vector< std::thread > workers;
@@ -108,8 +108,8 @@ auto ThreadPool::enqueue(F&& f, Args&&... args)
     return res;
 }
 
-// the destructor joins all threads
-inline ThreadPool::~ThreadPool()
+// Finish up the work of all threads, modified destructor
+inline void ThreadPool::finish()
 {
     {
         std::unique_lock<std::mutex> lock(queue_mutex);

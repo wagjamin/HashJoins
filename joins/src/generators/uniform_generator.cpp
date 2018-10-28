@@ -15,6 +15,8 @@ namespace generators {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<uint64_t> dis(min, max);
+        // Write data into new array
+        data = std::unique_ptr<std::tuple<uint64_t, uint64_t>[]>(new std::tuple<uint64_t, uint64_t>[count]);
 
         for(uint64_t i = 0; i < count; ++i){
             uint64_t val = dis(gen);

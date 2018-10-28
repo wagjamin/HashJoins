@@ -5,9 +5,9 @@
 #ifndef HASHJOINS_RADIX_JOIN_MT_H
 #define HASHJOINS_RADIX_JOIN_MT_H
 
-#include <memory>
 #include <vector>
 #include <tuple>
+#include <memory>
 
 namespace algorithms{
 
@@ -19,6 +19,11 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t> tuple;
         /// Join result, containing (join_val, rid_left, rid_right)
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
+        /***
+        * We sadly need this unwieldy construction of types to reuse our original
+        * nop_join implementation. Might change that in the future
+        */
+        typedef std::shared_ptr<std::vector<std::shared_ptr<std::vector<triple>>>> result_vec;
 
         /// Basic constructor
         radix_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
@@ -26,19 +31,15 @@ namespace algorithms{
         /// Join constructor with additional parameter
         radix_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r, double table_size,
                       uint8_t threads, uint8_t bits_per_pass, uint8_t passes);
-        /// Join constructor  offering maximum flexibility
-        radix_join_mt(tuple* left, tuple* right,
-                    uint64_t size_l, uint64_t size_r, double table_size, uint8_t threads,
-                      std::shared_ptr<std::vector<std::vector<triple>>> result, uint8_t bits_per_pass, uint8_t passes);
 
         /// Performs the actual join and writes result
         void execute();
 
         /// Set the result vector into which data should be written
-        void set_res(std::shared_ptr<std::vector<triple>> res);
+        void set_res(result_vec res);
 
-        /// Returns a pointer to the result vectors
-        std::shared_ptr<std::vector<std::vector<triple>>> get();
+        /// Returns a pointer to the result vectors.
+        result_vec get();
 
     private:
         /// Left join partner
@@ -56,7 +57,7 @@ namespace algorithms{
         /// Boolean flag indicating whether build was already called
         bool built;
         /// Pointer to the result vectors created by different partitions
-        std::shared_ptr<std::vector<std::vector<triple>>> result;
+        result_vec result;
         /// Number of radix bits on which data should be partitioned every pass
         uint8_t bits_per_pass;
         /// Number of partitioning passes that should be performed

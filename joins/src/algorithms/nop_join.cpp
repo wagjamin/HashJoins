@@ -50,6 +50,11 @@ namespace algorithms{
                                 table_size(table_size), built(false), result(std::move(result)){}
 
     void nop_join::execute() {
+        // No results on empty datasets
+        if(size_l == 0 || size_r == 0){
+            built = true;
+            return;
+        }
         auto new_size = static_cast<uint64_t>(1.5 * size_l);
         hash_table table = hash_table(new_size);
         // Build Phase
