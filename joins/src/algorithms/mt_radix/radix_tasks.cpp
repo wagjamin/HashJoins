@@ -14,7 +14,8 @@ namespace algorithms{
     task_context::task_context(uint8_t radix_bits, uint8_t radix_passes, uint8_t thread_count, double table_size,
                                ThreadPool *pool, task_context::result_vec results):
         radix_bits(radix_bits), radix_passes(radix_passes), thread_count(thread_count), table_size(table_size),
-        pool(pool), free_index(thread_count), output_mutex(), results(std::move(results))
+        pool(pool), free_index(thread_count), output_mutex(), results(std::move(results)), join_count(0),
+        join_exp(static_cast<uint64_t>(1) << static_cast<uint64_t>(radix_bits*radix_passes))
     {
         // Properly fill the free_index vector
         for(uint8_t k = 0; k < thread_count; ++k){
@@ -52,7 +53,23 @@ namespace algorithms{
         }
         // Create scatter tasks if spawning is enabled
         if (spawn) {
-            // TODO
+            // Create prefix sums used by the scatter task
+            uint64_t part_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(context->radix_bits);
+            uint64_t cl = (*hist_l)[0];
+            uint64_t cr = (*hist_r)[0];
+            (*hist_l)[0] = 0;
+            (*hist_r)[0] = 0;
+            for(uint64_t k = 1; k < part_count; ++k){
+                uint64_t temp_l = (*hist_l)[k];
+                uint64_t temp_r = (*hist_r)[k];
+                (*hist_l)[k] = cl;
+                (*hist_r)[k] = cr;
+                cl += temp_l;
+                cr += temp_r;
+            }
+            // Schedule scatter task based on prefix sum
+            context->pool->enqueue(scatter_task::execute, context, true, curr_depth, hist_l, hist_r, data_l, data_r,
+                    size_l, size_r, target_l, target_r);
         }
         // Return histograms
         return {hist_l, hist_r};
@@ -87,12 +104,47 @@ namespace algorithms{
         }
         // Create new partition or probe/build tasks
         if(spawn){
-            // TODO
+            // Number of partitions created by this scatter task
+            uint64_t part_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(context->radix_bits);
+            // We need to run more partition passes
+            if(curr_depth < context->radix_passes){
+                /*
+                 * Schedule the next round of partition tasks. This can be done by calculating the respective
+                 * sub-arrays from the prefix sums passed to the scatter task.
+                 * Since we updated the sums in the previous part now every index in the prefix sum actually refers
+                 * to the first index of the next partition
+                 */
+                for(uint64_t k = 0; k < part_count - 1; ++k){
+                    context->pool->enqueue(partition_task::execute, context, true, curr_depth + 1,
+                           target_l + (*sum_l)[k], target_r + (*sum_r)[k], (*sum_l)[k + 1] - (*sum_l)[k],
+                           (*sum_r)[k + 1] - (*sum_r)[k], data_l + (*sum_l)[k], data_r + (*sum_r)[k]);
+                }
+                // Fencepost, the first partition was not scheduled in the previous loop
+                context->pool->enqueue(partition_task::execute, context, true, curr_depth + 1,
+                           target_l, target_r, (*sum_l)[0], (*sum_r)[0], data_l, data_r);
+            }
+            // We create regular probe passes since we are in the deepest partition level
+            else{
+                // Nearly same as before when scheduling next round of partition passes, just have to pass less data
+                for(uint64_t k = 0; k < part_count - 1; ++k){
+                    context->pool->enqueue(join_task::execute, context, target_l + (*sum_l)[k], target_r + (*sum_r)[k],
+                                           (*sum_l)[k + 1] - (*sum_l)[k], (*sum_r)[k + 1] - (*sum_r)[k]);
+                }
+                // Fencepost, the first partition was not scheduled in the previous loop
+                context->pool->enqueue(join_task::execute, context, target_l, target_r, (*sum_l)[0], (*sum_r)[0]);
+            }
         }
         return true;
     }
 
     void join_task::execute(task_context* context, tuple* data_l, tuple* data_r, uint64_t size_l, uint64_t size_r){
+        // Check if this was the final join task, if so finish up the thread pool
+        uint64_t value = ++(context->join_count);
+        if(value == context->join_exp){
+            // Unlock to give control back to main radix join thread
+            context->join_wait.unlock();
+        }
+
         // No need to bother on empty partitions
         if(size_l == 0 || size_r == 0){
             return;

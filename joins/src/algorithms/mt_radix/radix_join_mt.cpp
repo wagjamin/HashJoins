@@ -6,7 +6,6 @@
 #include "algorithms/mt_radix/radix_tasks.h"
 #include <utility>
 #include <future>
-#include <iostream>
 
 namespace algorithms{
 
@@ -42,6 +41,7 @@ namespace algorithms{
         // Thread pool and context needed for further subtasks
         ThreadPool pool(threads);
         task_context context(bits_per_pass, passes, threads, table_size, &pool, result);
+        context.join_wait.lock();
         // Create histograms for partition tasks
         std::vector<std::future<histograms>> vec(threads);
         // Schedule the first round of partition tasks
@@ -80,12 +80,10 @@ namespace algorithms{
         sum_l[0] = 0;
         sum_r[0] = 0;
         for(uint64_t k = 1; k < part_count; ++k){
-            uint64_t temp_l = hist_l[k];
-            uint64_t temp_r = hist_r[k];
             sum_l[k] = cl;
             sum_r[k] = cr;
-            cl += temp_l;
-            cr += temp_r;
+            cl += hist_l[k];
+            cr += hist_r[k];
         }
 
         /*
@@ -127,16 +125,22 @@ namespace algorithms{
         if(passes == 1){
             // Schedule partition tasks
             for(uint64_t k = 0; k < part_count; ++k){
-                pool.enqueue(join_task::execute, &context, target_l.get() + sum_l[k], target_r.get() + sum_r[k], hist_l[k], hist_r[k]);
+                pool.enqueue(join_task::execute, &context, target_l.get() + sum_l[k], target_r.get() + sum_r[k],
+                             hist_l[k], hist_r[k]);
             }
         }
         // We have to perform more partitions and scatters
         else {
-
+            // We schedule the second round of partition tasks, but this time with automatic subtask spawning
+            for(uint64_t k = 0; k < part_count; ++k){
+                pool.enqueue(partition_task::execute, &context, true, 2, target_l.get() + sum_l[k],
+                             target_r.get() + sum_r[k], hist_l[k], hist_r[k], left + sum_l[k], right + sum_r[k]);
+            }
         }
-        // Execute all remaining tasks and then return
         built = true;
+        context.join_wait.lock();
         pool.finish();
+        context.join_wait.unlock();
     }
 
     radix_join_mt::result_vec radix_join_mt::get() {

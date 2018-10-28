@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <atomic>
 #include "ThreadPool.h"
 
 /**
@@ -32,6 +33,7 @@ namespace algorithms{
         task_context(uint8_t radix_bits, uint8_t radix_passes, uint8_t thread_count, double table_size,
                      ThreadPool* pool, result_vec results);
 
+
         /// The radix bits per pass
         uint8_t radix_bits;
         /// The total number of radix passes
@@ -51,6 +53,13 @@ namespace algorithms{
         std::vector<uint8_t> free_index;
         std::mutex output_mutex;
         result_vec results;
+        /// Mutex used for communication
+        //TODO proper condition variable, clean code
+        std::mutex join_wait;
+        /// Number of last level join ops that has executed, needed for pool termination
+        std::atomic<uint64_t> join_count;
+        /// Expected number of last level join operations
+        uint64_t join_exp;
 
         /// Hash function used throughout the partition phase
         uint64_t hash1(uint64_t val);
