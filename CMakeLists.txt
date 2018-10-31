@@ -47,8 +47,9 @@ include("${CMAKE_SOURCE_DIR}/benchmark/local.cmake")
 include("${CMAKE_SOURCE_DIR}/joins/local.cmake")
 
 add_custom_target(check
-    COMMAND CTEST_OUTPUT_ON_FAILURE=1 ${CMAKE_CTEST_COMMAND}
-    DEPENDS ${test_drivers})
+    COMMAND CTEST_OUTPUT_ON_FAILURE=1 ${CMAKE_CTEST_COMMAND} -VV
+    DEPENDS ${test_drivers}
+    )
 add_coverage_target(coverage ${test_drivers})
 
 # ---------------------------------------------------------------------------

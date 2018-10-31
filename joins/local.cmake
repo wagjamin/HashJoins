@@ -42,7 +42,7 @@ add_library(example STATIC ${SRC_LIB_EXAMPLE_CC})
 target_compile_options(example PUBLIC -Werror)
 target_include_directories(example PUBLIC
     "${CMAKE_SOURCE_DIR}/joins/include"
-        "${CMAKE_SOURCE_DIR}/joins/lib")
+    "${CMAKE_SOURCE_DIR}/joins/lib")
 target_link_libraries(example
     Threads::Threads
     )
@@ -51,16 +51,16 @@ target_link_libraries(example
 # Test driver
 # ---------------------------------------------------------------------------
 
-add_executable(tester_example "${TEST_LIB_EXAMPLE_CC}")
-target_link_libraries(tester_example
+add_executable(join_tester "${TEST_LIB_EXAMPLE_CC}")
+target_link_libraries(join_tester
     example
     gtest
     gmock
     Threads::Threads)
 
-add_test(NAME example
-    COMMAND tester_example)
-list(APPEND test_drivers tester_example)
+add_test(NAME JoinTest
+    COMMAND join_tester)
+list(APPEND test_drivers join_tester)
 
 # ---------------------------------------------------------------------------
 # Linting
