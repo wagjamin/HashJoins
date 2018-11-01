@@ -50,7 +50,7 @@ namespace algorithms{
                              uint64_t size_r, double table_size, uint8_t threads):
             left(left), right(right), size_l(size_l), size_r(size_r),
             table_size(table_size), threads(threads), built(false),
-            result(std::make_shared<std::vector<std::vector<triple>>>(threads))
+            result(std::move(std::make_shared<std::vector<std::vector<triple>>>(threads)))
     {}
 
     void nop_join_mt::execute() {

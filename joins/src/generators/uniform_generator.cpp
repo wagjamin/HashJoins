@@ -25,6 +25,19 @@ namespace generators {
 
     }
 
+    std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> uniform_generator::get_vec_copy() {
+        if(data == nullptr){
+            throw std::logic_error("copying may not be called before distribution has been built.");
+        }
+        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> ptr =
+                std::make_unique<std::vector<std::tuple<uint64_t, uint64_t>>>(get_count());
+        // Copy elements into the new vector
+        for(uint64_t k = 0; k < get_count(); ++k){
+            (*ptr)[k] = data[k];
+        }
+        return ptr;
+    }
+
     uint64_t uniform_generator::get_count() {
         return count;
     }

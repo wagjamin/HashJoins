@@ -7,24 +7,24 @@
 # ---------------------------------------------------------------------------
 
 set(BENCHMARK_CC
-    "${CMAKE_SOURCE_DIR}/benchmark/bm_bubble_sort.cc"
+    "${CMAKE_SOURCE_DIR}/benchmark/bm_joins_mt.cpp"
     )
 
 # ---------------------------------------------------------------------------
 # Benchmarks
 # ---------------------------------------------------------------------------
 
-add_executable(bm_bubble_sort
-    "${CMAKE_SOURCE_DIR}/benchmark/bm_bubble_sort.cc"
+add_executable(bm_joins
+    "${CMAKE_SOURCE_DIR}/benchmark/bm_joins_mt.cpp"
     )
-target_compile_options(bm_bubble_sort PUBLIC -Werror)
-target_link_libraries(bm_bubble_sort
+target_compile_options(bm_joins PUBLIC -Werror -O3)
+target_link_libraries(bm_joins
     example
     benchmark
     gtest
     Threads::Threads
     )
-list(APPEND benchmark_targets bm_bubble_sort)
+list(APPEND benchmark_targets bm_joins)
 
 add_custom_target(benchmarks)
 add_dependencies(benchmarks

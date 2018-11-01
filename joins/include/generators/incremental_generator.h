@@ -1,9 +1,9 @@
 //
-// Created by benjamin on 09.09.18.
+// Created by benjamin on 01.11.18.
 //
 
-#ifndef HASHJOINS_UNIFORM_GENERATOR_H
-#define HASHJOINS_UNIFORM_GENERATOR_H
+#ifndef HASHJOINS_INCREMENTAL_GENERATOR_H
+#define HASHJOINS_INCREMENTAL_GENERATOR_H
 
 #include <memory>
 #include <vector>
@@ -12,20 +12,19 @@
 namespace generators{
 
     /**
-     * Generates uniformly distributed data within a certain range.
-     * Then returns an array of tuples where the keys follow the given
-     * distribution.
+     * Generates an incremental set of tuples from within a range.
      * The RIDs are guaranteed to be unique within the whole dataset, but
      * do not follow a certain distribution (since they are not relevant
      * to the join itself).
      */
-    class uniform_generator{
+    class incremental_generator{
 
     public:
         /**
-         * Initializes the uniform number generator
+         * Initializes the uniform number generator. The first tuple will have value start, then ext one start + 1
+         * and so on until a final ending value is reached (inclusively).
          */
-        uniform_generator(uint64_t min, uint64_t max, size_t count);
+        incremental_generator(uint64_t start, uint64_t ending);
         /**
          * Performs the actual build process of creating data according to the distribution parameters
          */
@@ -43,19 +42,18 @@ namespace generators{
         std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> get_vec_copy();
 
         /// Member-wise copy and move is fine
-        ~uniform_generator() = default;
-        uniform_generator(const uniform_generator& t) = default;
-        uniform_generator(uniform_generator&& t) = default;
-        uniform_generator& operator=(const uniform_generator& t) = default;
-        uniform_generator& operator=(uniform_generator&& t) = default;
-
+        ~incremental_generator() = default;
+        incremental_generator(const incremental_generator& t) = default;
+        incremental_generator(incremental_generator&& t) = default;
+        incremental_generator& operator=(const incremental_generator& t) = default;
+        incremental_generator& operator=(incremental_generator&& t) = default;
     private:
-        uint64_t min;
-        uint64_t max;
-        size_t count;
+        uint64_t start;
+        uint64_t ending;
         std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> data;
     };
 
 } // namespace generators
 
-#endif //HASHJOINS_UNIFORM_GENERATOR_H
+
+#endif //HASHJOINS_INCREMENTAL_GENERATOR_H
