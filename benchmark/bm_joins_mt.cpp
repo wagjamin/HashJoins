@@ -83,10 +83,10 @@ namespace {
 // Using real time since we are in a multithreaded setting
 BENCHMARK(BenchmarkNOPSameSize)->Arg(1)->Arg(2)->Arg(3)->Arg(4)->UseRealTime()->Unit(benchmark::kMillisecond);
 BENCHMARK(BenchmarkRPJSPSameSize)
-        ->Args({1, 8})->Args({1, 9})->Args({1, 10})->Args({1, 11})
-        ->Args({2, 8})->Args({2, 9})->Args({2, 10})->Args({2, 11})
-        ->Args({3, 8})->Args({3, 9})->Args({3, 10})->Args({3, 11})
-        ->Args({4, 8})->Args({4, 9})->Args({4, 10})->Args({4, 11})
+        /*->Args({1, 8})->Args({1, 9})->Args({1, 10})*/->Args({1, 11})
+        /*->Args({2, 8})->Args({2, 9})->Args({2, 10})*/->Args({2, 11})
+        /*->Args({3, 8})->Args({3, 9})->Args({3, 10})*/->Args({3, 11})
+        /*->Args({4, 8})->Args({4, 9})->Args({4, 10})*/->Args({4, 11})
         ->UseRealTime()->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();

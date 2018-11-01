@@ -60,7 +60,7 @@ namespace algorithms{
         // Build Phase
         for(uint64_t k = 0; k < size_l; ++k){
             tuple& curr = left[k];
-            uint64_t index = std::get<0>(curr) % new_size;
+            uint64_t index = hash(std::get<0>(curr)) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             switch(bucket.count){
                 case 0:
@@ -87,7 +87,7 @@ namespace algorithms{
         built = true;
         for(uint64_t k = 0; k < size_r; ++k){
             tuple& curr = right[k];
-            uint64_t index = std::get<0>(curr) % new_size;
+            uint64_t index = hash(std::get<0>(curr)) % new_size;
             hash_table::bucket& bucket = table.arr[index];
             // Follow overflow buckets
             if(bucket.count > 2){
@@ -119,6 +119,17 @@ namespace algorithms{
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;
+    }
+
+    uint64_t nop_join::hash(uint64_t val) {
+        // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
+        // Implications on Query Processing" by Richter et al
+        val ^= val >> 33;
+        val *= 0xff51afd7ed558ccd;
+        val ^= val >> 33;
+        val *= 0xc4ceb9fe1a85ec53;
+        val ^= val >> 33;
+        return val;
     }
 
 } // namespace algorithms

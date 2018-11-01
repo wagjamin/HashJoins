@@ -73,7 +73,7 @@ namespace algorithms{
         void probe(uint64_t start, uint64_t end, hash_table* table, uint8_t t_num);
 
         /// Hash function used for build process
-        inline uint64_t hash(uint64_t val);
+        uint64_t hash(uint64_t val);
 
 
     };

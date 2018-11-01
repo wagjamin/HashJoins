@@ -8,6 +8,13 @@ namespace algorithms{
 
     // Hash functions used throughout the radix join
     uint64_t task_context::hash1(uint64_t val) {
+        // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
+        // Implications on Query Processing" by Richter et al
+        val ^= val >> 33;
+        val *= 0xff51afd7ed558ccd;
+        val ^= val >> 33;
+        val *= 0xc4ceb9fe1a85ec53;
+        val ^= val >> 33;
         return val;
     }
 

@@ -57,6 +57,8 @@ namespace algorithms{
 
         struct hash_table;
 
+        uint64_t hash(uint64_t val);
+
     };
 
 } // namespace algorithms
