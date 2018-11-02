@@ -21,7 +21,7 @@ namespace {
         std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
         // After this block we can forget the generators again
         {
-            generators::uniform_generator gen0(0, dataset_size - 1, dataset_size);
+            generators::incremental_generator gen0(0, dataset_size - 1);
             generators::uniform_generator gen1(0, dataset_size - 1, dataset_size);
             gen0.build();
             gen1.build();
@@ -35,7 +35,7 @@ namespace {
             std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
             std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
             // Create NOP Join
-            algorithms::nop_join_mt join(build_temp.data(), probe_temp.data(), dataset_size, dataset_size, 1.5,
+            algorithms::nop_join_mt join(build_temp.data(), probe_temp.data(), dataset_size, dataset_size, 1.0,
                                          threads);
             state.ResumeTiming();
             // Execute the actual join
@@ -54,7 +54,7 @@ namespace {
         std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
         // After this block we can forget the generators again
         {
-            generators::uniform_generator gen0(0, dataset_size - 1, dataset_size);
+            generators::incremental_generator gen0(0, dataset_size - 1);
             generators::uniform_generator gen1(0, dataset_size - 1, dataset_size);
             gen0.build();
             gen1.build();
@@ -68,7 +68,7 @@ namespace {
             std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
             std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
             // Create NOP Join
-            algorithms::radix_join_mt join(build_temp.data(), probe_temp.data(), dataset_size, dataset_size, 1.5,
+            algorithms::radix_join_mt join(build_temp.data(), probe_temp.data(), dataset_size, dataset_size, 1.0,
                                            threads, static_cast<uint8_t>(state.range(1)), 1);
             state.ResumeTiming();
             // Execute the actual join
@@ -78,16 +78,92 @@ namespace {
         state.SetItemsProcessed(dataset_size * state.iterations() * 2);
     }
 
+    void BenchmarkNOPDiffSize(benchmark::State &state) {
+        // Far lager probe than build side
+        uint64_t data_size_l = static_cast<uint64_t>(1) << static_cast<uint64_t>(16);
+        uint64_t data_size_r = static_cast<uint64_t>(1) << static_cast<uint64_t>(25);
+        auto threads = static_cast<uint8_t>(state.range(0));
+
+        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> build;
+        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
+        // After this block we can forget the generators again
+        {
+            generators::incremental_generator gen0(0, data_size_l - 1);
+            generators::uniform_generator gen1(0, data_size_l - 1, data_size_r);
+            gen0.build();
+            gen1.build();
+            build = gen0.get_vec_copy();
+            probe = gen1.get_vec_copy();
+        }
+
+        for (auto _ : state) {
+            state.PauseTiming();
+            // Create copies of the generated arrays for the current task
+            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
+            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
+            // Create NOP Join
+            algorithms::nop_join_mt join(build_temp.data(), probe_temp.data(), data_size_l, data_size_r, 1.0,
+                                         threads);
+            state.ResumeTiming();
+            // Execute the actual join
+            join.execute();
+        }
+
+        state.SetItemsProcessed((data_size_r + data_size_l) * state.iterations());
+    }
+
+    void BenchmarkRPJSPDDiffSize(benchmark::State &state) {
+        // Far lager probe than build side
+        uint64_t data_size_l = static_cast<uint64_t>(1) << static_cast<uint64_t>(16);
+        uint64_t data_size_r = static_cast<uint64_t>(1) << static_cast<uint64_t>(25);
+        auto threads = static_cast<uint8_t>(state.range(0));
+
+        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> build;
+        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
+        // After this block we can forget the generators again
+        {
+            generators::incremental_generator gen0(0, data_size_l - 1);
+            generators::uniform_generator gen1(0, data_size_l - 1, data_size_r);
+            gen0.build();
+            gen1.build();
+            build = gen0.get_vec_copy();
+            probe = gen1.get_vec_copy();
+        }
+
+        for (auto _ : state) {
+            state.PauseTiming();
+            // Create copies of the generated arrays for the current task
+            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
+            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
+            // Create NOP Join
+            algorithms::radix_join_mt join(build_temp.data(), probe_temp.data(), data_size_l, data_size_r, 1.0,
+                                           threads, static_cast<uint8_t>(state.range(1)), 1);
+            state.ResumeTiming();
+            // Execute the actual join
+            join.execute();
+        }
+
+        state.SetItemsProcessed((data_size_r + data_size_l) * state.iterations());
+    }
+
 }
 
 // Using real time since we are in a multithreaded setting
+BENCHMARK(BenchmarkNOPDiffSize)->Arg(1)->Arg(2)->Arg(3)->Arg(4)->UseRealTime()->Unit(benchmark::kMillisecond);
+BENCHMARK(BenchmarkRPJSPDDiffSize)
+        ->Args({1, 4})->Args({1, 5})->Args({1, 6})->Args({1, 7})
+        ->Args({2, 4})->Args({2, 5})->Args({2, 6})->Args({2, 7})
+        ->Args({3, 4})->Args({3, 5})->Args({3, 6})->Args({3, 7})
+        ->Args({4, 4})->Args({4, 5})->Args({4, 6})->Args({4, 7})
+        ->UseRealTime()->Unit(benchmark::kMillisecond);
 BENCHMARK(BenchmarkNOPSameSize)->Arg(1)->Arg(2)->Arg(3)->Arg(4)->UseRealTime()->Unit(benchmark::kMillisecond);
 BENCHMARK(BenchmarkRPJSPSameSize)
-        /*->Args({1, 8})->Args({1, 9})->Args({1, 10})*/->Args({1, 11})
-        /*->Args({2, 8})->Args({2, 9})->Args({2, 10})*/->Args({2, 11})
-        /*->Args({3, 8})->Args({3, 9})->Args({3, 10})*/->Args({3, 11})
-        /*->Args({4, 8})->Args({4, 9})->Args({4, 10})*/->Args({4, 11})
+        ->Args({1, 8})->Args({1, 9})->Args({1, 10})->Args({1, 11})
+        ->Args({2, 8})->Args({2, 9})->Args({2, 10})->Args({2, 11})
+        ->Args({3, 8})->Args({3, 9})->Args({3, 10})->Args({3, 11})
+        ->Args({4, 8})->Args({4, 9})->Args({4, 10})->Args({4, 11})
         ->UseRealTime()->Unit(benchmark::kMillisecond);
+
 
 BENCHMARK_MAIN();
 
