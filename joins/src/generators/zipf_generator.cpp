@@ -14,7 +14,7 @@ namespace generators{
     // Adapted C Zipf Generator from: https://stackoverflow.com/a/48279287/4945380
     void zipf_generator::build() {
         double c = 0;                      // Normalization constant
-        double sum_probs[max+1];         // Pre-calculated sum of probabilities
+        double sum_probs[max+1];            // Pre-calculated sum of probabilities
         double z;                          // Uniform random number (0 < z < 1)
         uint64_t zipf_value = 0;           // Computed exponential value to be returned
         uint64_t i;                        // Loop counter

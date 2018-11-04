@@ -4,7 +4,6 @@
 
 #include "generators/zipf_generator.h"
 #include "gtest/gtest.h"
-#include <iostream>
 #include <unordered_set>
 
 using namespace generators; // NOLINT
@@ -24,7 +23,6 @@ TEST(ZipfTester, RangeTester) {
     ASSERT_EQ(gen.get_count(), count);
 
     for(uint64_t k = 0; k < count; ++k){
-        std::cout << std::get<0>(res[k]) << "\n";
         ASSERT_LE(std::get<0>(res[k]), 1000);
     }
 }
