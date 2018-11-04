@@ -2,7 +2,7 @@
 # Files
 # ---------------------------------------------------------------------------
 
-set(SRC_LIB_EXAMPLE_H
+set(SRC_LIB_H
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/radix_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join_mt.h"
@@ -14,7 +14,7 @@ set(SRC_LIB_EXAMPLE_H
         "${CMAKE_SOURCE_DIR}/joins/include/generators/zipf_generator.h"
     )
 
-set(SRC_LIB_EXAMPLE_CC
+set(SRC_LIB_CC
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/radix_join.cpp"
         "${CMAKE_SOURCE_DIR}/joins/src/algorithms/nop_join_mt.cpp"
@@ -25,7 +25,7 @@ set(SRC_LIB_EXAMPLE_CC
         "${CMAKE_SOURCE_DIR}/joins/src/generators/zipf_generator.cpp"
     )
 
-set(TEST_LIB_EXAMPLE_CC
+set(TEST_LIB_CC
         "${CMAKE_SOURCE_DIR}/joins/test/tester.cc"
         "${CMAKE_SOURCE_DIR}/joins/test/generators/zipf_generator_test.cpp"
         "${CMAKE_SOURCE_DIR}/joins/test/generators/incremental_generator_test.cpp"
@@ -40,13 +40,13 @@ set(TEST_LIB_EXAMPLE_CC
 # Library
 # ---------------------------------------------------------------------------
 
-add_library(example STATIC ${SRC_LIB_EXAMPLE_CC})
+add_library(joins STATIC ${SRC_LIB_CC})
 
-target_compile_options(example PUBLIC -Werror)
-target_include_directories(example PUBLIC
+target_compile_options(joins PUBLIC -Werror -O3)
+target_include_directories(joins PUBLIC
     "${CMAKE_SOURCE_DIR}/joins/include"
     "${CMAKE_SOURCE_DIR}/joins/lib")
-target_link_libraries(example
+target_link_libraries(joins
     Threads::Threads
     )
 
@@ -54,10 +54,10 @@ target_link_libraries(example
 # Test driver
 # ---------------------------------------------------------------------------
 
-add_executable(join_tester "${TEST_LIB_EXAMPLE_CC}")
+add_executable(join_tester "${TEST_LIB_CC}")
 target_compile_options(join_tester PUBLIC -O3)
 target_link_libraries(join_tester
-    example
+    joins
     gtest
     gmock
     Threads::Threads)
@@ -70,5 +70,5 @@ list(APPEND test_drivers join_tester)
 # Linting
 # ---------------------------------------------------------------------------
 
-add_cpplint_target(lint_example "${SRC_LIB_EXAMPLE_H};${SRC_LIB_EXAMPLE_CC};${TEST_LIB_EXAMPLE_CC}")
+add_cpplint_target(lint_example "${SRC_LIB_H};${SRC_LIB_CC};${TEST_LIB_CC}")
 list(APPEND lint_targets lint_example)
