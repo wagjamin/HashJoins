@@ -128,9 +128,9 @@ namespace {
 
 
     // Static member containing the threads the uniform benchmarks should be run on
-    static std::vector<int64_t> threads{1, 2, 3, 4}; // NOLINT
+    static std::vector<int64_t> threads{1, 2, 3, 4, 5, 7, 10, 12, 14, 15, 17, 20}; // NOLINT
     // The threads the zipf benchmarks should be run on
-    static std::vector<int64_t> zipf_threads{2, 4}; // NOLINT
+    static std::vector<int64_t> zipf_threads{20}; // NOLINT
 
     // Applying Thread and Size Arguments onto NOP Join
     static void NOPArgsUniform(benchmark::internal::Benchmark *b) {
@@ -227,10 +227,10 @@ namespace {
 } // namespace
 
 // Using real time since we are in a multithreaded setting
-BENCHMARK(BenchmarkNOP)->Apply(NOPArgsZipf)->UseRealTime()->Unit(benchmark::kMillisecond);
-BENCHMARK(BenchmarkRPJ)->Apply(RPJArgsZipf)->UseRealTime()->Unit(benchmark::kMillisecond);
 BENCHMARK(BenchmarkNOP)->Apply(NOPArgsUniform)->UseRealTime()->Unit(benchmark::kMillisecond);
 BENCHMARK(BenchmarkRPJ)->Apply(RPJArgsUniform)->UseRealTime()->Unit(benchmark::kMillisecond);
+BENCHMARK(BenchmarkNOP)->Apply(NOPArgsZipf)->UseRealTime()->Unit(benchmark::kMillisecond);
+BENCHMARK(BenchmarkRPJ)->Apply(RPJArgsZipf)->UseRealTime()->Unit(benchmark::kMillisecond);
 
 BENCHMARK_MAIN();
 
