@@ -31,17 +31,10 @@ namespace generators{
          * Performs the actual build process of creating data according to the distribution parameters
          */
         void build();
-        /**
-         * Returns a shared array containing the generated data.
-         * May not be called without previous call to build.
-         * The first tuple element contains the values following the distribution, the
-         * second tuple element contains the RID.
-         */
-        std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> get();
         /// Return the number of elements generated
         uint64_t get_count();
-        /// Return an exclusive copy of the data in a vector
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> get_vec_copy();
+        /// Return an exclusive copy of the data in a vector. May not be called before previous call to build.
+        std::vector<std::tuple<uint64_t, uint64_t>> get_vec_copy();
 
         /// Member-wise copy and move is fine
         ~zipf_generator() = default;
@@ -51,10 +44,11 @@ namespace generators{
         zipf_generator& operator=(zipf_generator&& t) = default;
 
     private:
+        bool built;
         uint64_t max;
         double alpha;
         size_t count;
-        std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> data;
+        std::vector<std::tuple<uint64_t, uint64_t>> data;
     };
 
 }

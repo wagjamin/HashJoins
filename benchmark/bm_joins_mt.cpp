@@ -28,8 +28,8 @@ namespace {
         // Get thread count
         auto threads = static_cast<uint8_t>(state.range(2));
 
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> build;
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
+        std::vector<std::tuple<uint64_t, uint64_t>> build;
+        std::vector<std::tuple<uint64_t, uint64_t>> probe;
         // After this block we can forget the generators again
         {
             generators::incremental_generator gen0(1, data_size_l);
@@ -54,8 +54,8 @@ namespace {
         for (auto _ : state) {
             state.PauseTiming();
             // Create copies of the generated arrays for the current task
-            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
-            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
+            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = build;
+            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = probe;
             // Create NOP Join
             algorithms::nop_join_mt join(build_temp.data(), probe_temp.data(), data_size_l, data_size_r, 1.0,
                                          threads);
@@ -87,8 +87,8 @@ namespace {
         auto runs = static_cast<uint8_t>(state.range(3));
         auto bits = static_cast<uint8_t>(state.range(4));
 
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> build;
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> probe;
+        std::vector<std::tuple<uint64_t, uint64_t>> build;
+        std::vector<std::tuple<uint64_t, uint64_t>> probe;
         // After this block we can forget the generators again
         {
             generators::incremental_generator gen0(1, data_size_l);
@@ -113,8 +113,8 @@ namespace {
         for (auto _ : state) {
             state.PauseTiming();
             // Create copies of the generated arrays for the current task
-            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = *build;
-            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = *probe;
+            std::vector<std::tuple<uint64_t, uint64_t>> build_temp = build;
+            std::vector<std::tuple<uint64_t, uint64_t>> probe_temp = probe;
             // Create NOP Join
             algorithms::radix_join_mt join(build_temp.data(), probe_temp.data(), data_size_l, data_size_r, 1.0,
                                            threads, bits, runs);
@@ -133,7 +133,7 @@ namespace {
     static std::vector<int64_t> zipf_threads{20}; // NOLINT
 
     // Applying Thread and Size Arguments onto NOP Join
-    static void NOPArgsUniform(benchmark::internal::Benchmark *b) {
+    void NOPArgsUniform(benchmark::internal::Benchmark *b) {
         // Run on Same Sized Input
         int64_t same_size_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(24);
         for (int64_t k: threads) {
@@ -147,8 +147,8 @@ namespace {
         }
     }
 
-// Applying Thread and Size Arguments onto Radix
-    static void RPJArgsUniform(benchmark::internal::Benchmark *b) {
+    // Applying Thread and Size Arguments onto Radix
+    void RPJArgsUniform(benchmark::internal::Benchmark *b) {
         // Run on Same Sized Input
         int64_t same_size_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(24);
         for (int64_t k: threads) {
@@ -181,7 +181,7 @@ namespace {
     }
 
     // Applying Thread and Size Arguments onto NOP Join with underlying zipf distribution
-    static void NOPArgsZipf(benchmark::internal::Benchmark *b) {
+    void NOPArgsZipf(benchmark::internal::Benchmark *b) {
         // Run on Same Sized Input
         int64_t same_size_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(24);
         for (int64_t k: zipf_threads) {
@@ -200,7 +200,7 @@ namespace {
     }
 
     // Applying Thread and Size Arguments onto Radix with underlying zipf distribution
-    static void RPJArgsZipf(benchmark::internal::Benchmark *b) {
+    void RPJArgsZipf(benchmark::internal::Benchmark *b) {
         // Run on Same Sized Input
         int64_t same_size_count = static_cast<uint64_t>(1) << static_cast<uint64_t>(24);
         for (int64_t k: zipf_threads) {

@@ -13,7 +13,7 @@ TEST(IncGenTest, RangeTester) {
     uint64_t max = 100000;
     incremental_generator gen(0, max);
     gen.build();
-    auto res = gen.get();
+    auto res = gen.get_vec_copy();
     ASSERT_EQ(gen.get_count(), max + 1);
 
     for(uint64_t k = 0; k <= max; ++k){

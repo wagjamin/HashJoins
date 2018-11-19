@@ -34,10 +34,10 @@ uint64_t get_size(std::vector<std::shared_ptr<std::vector<radix_join_mt::triple>
 TEST(RadixTestMT, CreationTesterSTSP) {
     uniform_generator uni(0, 10000, 1000);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), 1000, 1000, 1.5, 1, 8, 1);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), 1000, 1000, 1.5, 1, 8, 1);
     ASSERT_ANY_THROW(join.get());
 }
 
@@ -48,13 +48,13 @@ TEST(RadixTestMT, NoResTesterSTSP) {
     uint64_t count = 1000;
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     min = 20000;
     max = 30000;
     gen = uniform_generator(min, max, count);
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, 1, 8, 1);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, 1, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), 0);
 }
@@ -64,11 +64,11 @@ TEST(RadixTestMT, CrossTester1STSP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni = uniform_generator(1,1,1);
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, 1, 1.5, 1, 8, 1);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, 1, 1.5, 1, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count);
 }
@@ -79,10 +79,10 @@ TEST(RadixTestMT, CrossTester2STSP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, 1, 8, 1);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, 1, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count*count);
 }
@@ -94,10 +94,10 @@ TEST(RadixTestMT, StatisticalTesterSTSP){
     uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, 1, 8, 1);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, 1, 8, 1);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
@@ -118,13 +118,13 @@ TEST(RadixTestMT, NoResTesterMTSP) {
     uint64_t count = 1000;
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     min = 20000;
     max = 30000;
     gen = uniform_generator(min, max, count);
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, 8, 1);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), 0);
 }
@@ -134,11 +134,11 @@ TEST(RadixTestMT, CrossTester1MTSP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni = uniform_generator(1,1,1);
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, 1, 1.5, thread_count, 8, 1);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count);
 }
@@ -149,10 +149,10 @@ TEST(RadixTestMT, CrossTester2MTSP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, 8, 1);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, 8, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count*count);
 }
@@ -164,10 +164,10 @@ TEST(RadixTestMT, StatisticalTesterMTSP){
     uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, 8, 1);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, 8, 1);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
@@ -188,13 +188,13 @@ TEST(RadixTestMT, NoResTesterMTMP) {
     uint64_t count = 1000;
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     min = 20000;
     max = 30000;
     gen = uniform_generator(min, max, count);
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, part_bits, part_runs);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, part_bits, part_runs);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), 0);
 }
@@ -204,11 +204,11 @@ TEST(RadixTestMT, CrossTester1MTMP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni = uniform_generator(1,1,1);
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, 1, 1.5, thread_count, part_bits, part_runs);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count, part_bits, part_runs);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count);
 }
@@ -219,10 +219,10 @@ TEST(RadixTestMT, CrossTester2MTMP) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, part_bits, part_runs);
+    auto right = uni.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, part_bits, part_runs);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count*count);
 }
@@ -234,10 +234,10 @@ TEST(RadixTestMT, StatisticalTesterMTMP){
     uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     gen.build();
-    auto right = gen.get();
-    radix_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count, part_bits, part_runs);
+    auto right = gen.get_vec_copy();
+    radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, part_bits, part_runs);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();

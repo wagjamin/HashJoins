@@ -19,7 +19,7 @@ TEST(ZipfTester, RangeTester) {
     uint64_t count = static_cast<uint64_t>(1) << static_cast<uint64_t>(10);
     zipf_generator gen(1000, 0.25, count);
     gen.build();
-    auto res = gen.get();
+    auto res = gen.get_vec_copy();
     ASSERT_EQ(gen.get_count(), count);
 
     for(uint64_t k = 0; k < count; ++k){

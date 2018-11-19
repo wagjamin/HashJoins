@@ -8,45 +8,32 @@
 namespace generators {
 
     uniform_generator::uniform_generator(size_t min, uint64_t max, uint64_t count):
-            min(min), max(max), count (count), data(new std::tuple<uint64_t, uint64_t>[count]) {}
+            built(false), min(min), max(max), count (count), data() {}
 
     void uniform_generator::build() {
 
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<uint64_t> dis(min, max);
-        // Write data into new array
-        data = std::shared_ptr<std::tuple<uint64_t, uint64_t>[]>(new std::tuple<uint64_t, uint64_t>[count]);
+        data.reserve(count);
+        built = true;
 
         for(uint64_t i = 0; i < count; ++i){
             uint64_t val = dis(gen);
-            data[i] = std::tuple<uint64_t, uint64_t>{val, i};
+            data.emplace_back(val, i);
         }
 
     }
 
-    std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> uniform_generator::get_vec_copy() {
-        if(data == nullptr){
+    std::vector<std::tuple<uint64_t, uint64_t>> uniform_generator::get_vec_copy() {
+        if(!built){
             throw std::logic_error("copying may not be called before distribution has been built.");
         }
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> ptr =
-                std::make_unique<std::vector<std::tuple<uint64_t, uint64_t>>>(get_count());
-        // Copy elements into the new vector
-        for(uint64_t k = 0; k < get_count(); ++k){
-            (*ptr)[k] = data[k];
-        }
-        return ptr;
+        return data;
     }
 
     uint64_t uniform_generator::get_count() {
         return count;
-    }
-
-    std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> uniform_generator::get() {
-        if(data == nullptr){
-            throw std::logic_error("get() may not be called before distribution has been built.");
-        }
-        return data;
     }
 
 } // namespace generators

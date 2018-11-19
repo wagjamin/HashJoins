@@ -9,10 +9,13 @@
 namespace generators{
 
     zipf_generator::zipf_generator(uint64_t max, double alpha, size_t count):
-        max(max), alpha(alpha), count(count), data(nullptr){}
+        built(false), max(max), alpha(alpha), count(count), data(){}
 
     // Adapted C Zipf Generator from: https://stackoverflow.com/a/48279287/4945380
     void zipf_generator::build() {
+        built = true;
+        data.reserve(count);
+
         double c = 0;                      // Normalization constant
         double sum_probs[max+1];            // Pre-calculated sum of probabilities
         double z;                          // Uniform random number (0 < z < 1)
@@ -29,9 +32,6 @@ namespace generators{
         for (i=1; i<=max; i++) {
             sum_probs[i] = sum_probs[i-1] + c / pow(i, alpha);
         }
-
-        // Initialize result array
-        data = std::shared_ptr<std::tuple<uint64_t, uint64_t>[]>(new std::tuple<uint64_t, uint64_t>[count]);
 
         // Pull a uniform random number (0 < z < 1)
         std::random_device rd;
@@ -59,7 +59,7 @@ namespace generators{
                 }
             } while (low <= high);
 
-            data[k] = {zipf_value, k};
+            data.emplace_back(zipf_value, k);
         }
     }
 
@@ -67,22 +67,9 @@ namespace generators{
         return count;
     }
 
-    std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> zipf_generator::get_vec_copy() {
-        if(data == nullptr){
+    std::vector<std::tuple<uint64_t, uint64_t>> zipf_generator::get_vec_copy() {
+        if(!built){
             throw std::logic_error("copying may not be called before distribution has been built.");
-        }
-        std::unique_ptr<std::vector<std::tuple<uint64_t, uint64_t>>> ptr =
-                std::make_unique<std::vector<std::tuple<uint64_t, uint64_t>>>(get_count());
-        // Copy elements into the new vector
-        for(uint64_t k = 0; k < get_count(); ++k){
-            (*ptr)[k] = data[k];
-        }
-        return ptr;
-    }
-
-    std::shared_ptr<std::tuple<uint64_t, uint64_t>[]> zipf_generator::get() {
-        if(data == nullptr){
-            throw std::logic_error("get() may not be called before distribution has been built.");
         }
         return data;
     }

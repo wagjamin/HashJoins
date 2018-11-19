@@ -30,10 +30,10 @@ uint64_t get_size(std::vector<std::vector<nop_join_mt::triple>>* output){
 TEST(NopTestMT, CreationTesterST) {
     uniform_generator uni(0, 10000, 1000);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), 1000, 1000, 1.5, 1);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), 1000, 1000, 1.5, 1);
     ASSERT_ANY_THROW(join.get());
 }
 
@@ -44,13 +44,13 @@ TEST(NopTestMT, NoResTesterST) {
     uint64_t count = 1000;
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     min = 20000;
     max = 30000;
     gen = uniform_generator(min, max, count);
     gen.build();
-    auto right = gen.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, 1);
+    auto right = gen.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), 0);
 }
@@ -60,11 +60,11 @@ TEST(NopTestMT, CrossTester1ST) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni = uniform_generator(1,1,1);
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), count, 1, 1.5, 1);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, 1, 1.5, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count);
 }
@@ -75,10 +75,10 @@ TEST(NopTestMT, CrossTester2ST) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, 1);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, 1);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count*count);
 }
@@ -90,10 +90,10 @@ TEST(NopTestMT, StatisticalTesterST){
     uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     gen.build();
-    auto right = gen.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, 1);
+    auto right = gen.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, 1);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
@@ -109,10 +109,10 @@ TEST(NopTestMT, StatisticalTesterST){
 TEST(NopTestMT, CreationTesterMT) {
     uniform_generator uni(0, 10000, 1000);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), 1000, 1000, 1.5, thread_count);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), 1000, 1000, 1.5, thread_count);
     ASSERT_ANY_THROW(join.get());
 }
 
@@ -123,13 +123,13 @@ TEST(NopTestMT, NoResTesterMT) {
     uint64_t count = 1000;
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     min = 20000;
     max = 30000;
     gen = uniform_generator(min, max, count);
     gen.build();
-    auto right = gen.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count);
+    auto right = gen.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), 0);
 }
@@ -139,11 +139,11 @@ TEST(NopTestMT, CrossTester1MT) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni = uniform_generator(1,1,1);
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), count, 1, 1.5, thread_count);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count);
 }
@@ -154,10 +154,10 @@ TEST(NopTestMT, CrossTester2MT) {
     uint64_t count = 1000;
     uniform_generator uni(1, 1, count);
     uni.build();
-    auto left = uni.get();
+    auto left = uni.get_vec_copy();
     uni.build();
-    auto right = uni.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count);
+    auto right = uni.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count);
     join.execute();
     ASSERT_EQ(get_size(join.get().get()), count*count);
 }
@@ -169,10 +169,10 @@ TEST(NopTestMT, StatisticalTesterMT){
     uint64_t max = static_cast<uint64_t>(1) << static_cast<uint64_t>(12);
     uniform_generator gen(min, max, count);
     gen.build();
-    auto left = gen.get();
+    auto left = gen.get_vec_copy();
     gen.build();
-    auto right = gen.get();
-    nop_join_mt join(left.get(), right.get(), count, count, 1.5, thread_count);
+    auto right = gen.get_vec_copy();
+    nop_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count);
     std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
     join.execute();
     std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
