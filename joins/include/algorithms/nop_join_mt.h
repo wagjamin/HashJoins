@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 06.10.18.
+// Benjamin Wagner 2018
 //
 
 #ifndef HASHJOINS_NOP_JOIN_MT_H

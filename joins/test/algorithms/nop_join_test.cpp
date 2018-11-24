@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 20.09.18.
+// Benjamin Wagner 2018
 //
 
 #include "generators/uniform_generator.h"

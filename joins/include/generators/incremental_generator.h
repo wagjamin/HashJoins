@@ -1,7 +1,6 @@
 //
-// Created by benjamin on 01.11.18.
+// Benjamin Wagner 2018
 //
-
 #ifndef HASHJOINS_INCREMENTAL_GENERATOR_H
 #define HASHJOINS_INCREMENTAL_GENERATOR_H
 

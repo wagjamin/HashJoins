@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 09.09.18.
+// Benjamin Wagner 2018
 //
 
 #ifndef HASHJOINS_UNIFORM_GENERATOR_H

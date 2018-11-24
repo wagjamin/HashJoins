@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 01.11.18.
+// Benjamin Wagner 2018
 //
 
 #include <chrono>

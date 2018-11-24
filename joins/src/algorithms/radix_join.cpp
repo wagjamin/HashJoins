@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 26.09.18.
+// Benjamin Wagner 2018
 //
 
 #include "algorithms/radix_join.h"

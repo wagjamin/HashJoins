@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 06.10.18.
+// Benjamin Wagner 2018
 //
 
 #include "algorithms/nop_join_mt.h"

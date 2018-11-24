@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 21.10.18.
+// Benjamin Wagner 2018
 //
 
 #ifndef HASHJOINS_RADIX_JOIN_MT_H

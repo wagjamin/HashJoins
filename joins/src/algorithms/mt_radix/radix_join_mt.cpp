@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 21.10.18.
+// Benjamin Wagner 2018
 //
 
 #include "algorithms/mt_radix/radix_join_mt.h"

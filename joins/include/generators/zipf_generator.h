@@ -1,5 +1,5 @@
 //
-// Created by benjamin on 04.11.18.
+// Benjamin Wagner 2018
 //
 
 #ifndef HASHJOINS_ZIPF_GENERATOR_H
