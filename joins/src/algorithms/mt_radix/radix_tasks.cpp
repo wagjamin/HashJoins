@@ -21,8 +21,8 @@ namespace algorithms{
     task_context::task_context(uint8_t radix_bits, uint8_t radix_passes, uint8_t thread_count, double table_size,
                                ThreadPool *pool, task_context::result_vec results):
         radix_bits(radix_bits), radix_passes(radix_passes), thread_count(thread_count), table_size(table_size),
-        pool(pool), free_index(thread_count), output_mutex(), results(std::move(results)), join_count(0),
-        join_exp(static_cast<uint64_t>(1) << static_cast<uint64_t>(radix_bits*radix_passes))
+        pool(pool), free_index(thread_count), output_mutex(), results(std::move(results)), finished(false),
+        join_count(0), join_exp(static_cast<uint64_t>(1) << static_cast<uint64_t>(radix_bits*radix_passes))
     {
         // Properly fill the free_index vector
         for(uint8_t k = 0; k < thread_count; ++k){
@@ -147,9 +147,13 @@ namespace algorithms{
     void join_task::execute(task_context* context, tuple* data_l, tuple* data_r, uint64_t size_l, uint64_t size_r){
         // Check if this was the final join task, if so finish up the thread pool
         uint64_t value = ++(context->join_count);
+        // Notify the waiting call to execute() in radix_join_mt that we are finished
         if(value == context->join_exp){
-            // Unlock to give control back to main radix join thread
-            context->join_wait.unlock();
+            {
+                std::lock_guard<std::mutex> lk(context -> join_wait);
+                context -> finished = true;
+            }
+            (context -> wait).notify_one();
         }
 
         // No need to bother on empty partitions
@@ -157,19 +161,20 @@ namespace algorithms{
             return;
         }
         // First we obtain a valid output buffer
-        context -> output_mutex.lock();
+        std::unique_lock<std::mutex> lock(context -> output_mutex, std::defer_lock);
+        lock.lock();
         uint8_t index = context->free_index.back();
         context->free_index.pop_back();
-        context -> output_mutex.unlock();
+        lock.unlock();
         // Calculate index%threads to obtain index of a currently unused output vector
         auto output = (*context->results)[index];
         // Run a simple no partitioning join on the given data
         nop_join join(data_l, data_r, size_l, size_r, context->table_size, output);
         join.execute();
         // We put the output buffer back into the unused stack
-        context -> output_mutex.lock();
+        lock.lock();
         context->free_index.emplace_back(index);
-        context -> output_mutex.unlock();
+        lock.unlock();
     }
 
 } // namespace algorithms

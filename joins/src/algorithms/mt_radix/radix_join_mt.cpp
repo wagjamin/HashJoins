@@ -27,7 +27,6 @@ namespace algorithms{
     }
 
     // Run the actual radix join using the tools from radix_task
-    // TODO Clean up code
     void radix_join_mt::execute() {
         // No results on empty datasets
         if(size_l == 0 || size_r == 0){
@@ -41,8 +40,7 @@ namespace algorithms{
         // Thread pool and context needed for further subtasks
         ThreadPool pool(threads);
         task_context context(bits_per_pass, passes, threads, table_size, &pool, result);
-        context.join_wait.lock();
-        // Create histograms for partition tasks
+        // Will get unlocked once all partition tasks are finished
         std::vector<std::future<histograms>> vec(threads);
         // Schedule the first round of partition tasks
         uint64_t range_l = size_l / threads;
@@ -138,9 +136,10 @@ namespace algorithms{
             }
         }
         built = true;
-        context.join_wait.lock();
+        // Wait until all last level join tasks are finished, then we can finish up
+        std::unique_lock<std::mutex> lk(context.join_wait);
+        context.wait.wait(lk, [&context]{return context.finished;});
         pool.finish();
-        context.join_wait.unlock();
     }
 
     radix_join_mt::result_vec radix_join_mt::get() {

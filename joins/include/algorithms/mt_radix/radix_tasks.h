@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <mutex>
+#include <condition_variable>
 #include <vector>
 #include <atomic>
 #include "ThreadPool.h"
@@ -44,7 +45,7 @@ namespace algorithms{
         double table_size;
         /// The thread pool needed for spawning subtasks
         ThreadPool* pool;
-        /***
+        /**
          * We need some form of output coordination.
          * The results vector stores the actual arrays being written to,
          * while the free_index is used as a stack in order to maintain the currently
@@ -53,9 +54,14 @@ namespace algorithms{
         std::vector<uint8_t> free_index;
         std::mutex output_mutex;
         result_vec results;
-        /// Mutex used for communication
-        //TODO proper condition variable, clean code
+        /**
+         * We require coordination between the radix_join_mt and the last level
+         * join tasks. This is done through a condition variable, where the radix join
+         * gets notified once all last level join tasks are completed.
+         */
         std::mutex join_wait;
+        std::condition_variable wait;
+        bool finished;
         /// Number of last level join ops that has executed, needed for pool termination
         std::atomic<uint64_t> join_count;
         /// Expected number of last level join operations
