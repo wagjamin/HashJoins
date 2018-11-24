@@ -24,6 +24,8 @@ namespace generators{
     public:
         /// Initializes the uniform number generator
         uniform_generator(uint64_t min, uint64_t max, size_t count);
+        /// For Benchmarking purposes the generator can be initialized with a fixed seed
+        uniform_generator(uint64_t min, uint64_t max, size_t count, uint64_t seed);
         /// Performs the actual build process of creating data according to the distribution parameters
         void build();
         /// Return the number of elements generated
@@ -43,6 +45,8 @@ namespace generators{
         uint64_t min;
         uint64_t max;
         size_t count;
+        /// Seed value, depends on which constructor is called
+        uint64_t seed;
         std::vector<std::tuple<uint64_t, uint64_t>> data;
     };
 

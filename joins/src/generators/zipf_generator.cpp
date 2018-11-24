@@ -9,7 +9,15 @@
 namespace generators{
 
     zipf_generator::zipf_generator(uint64_t max, double alpha, size_t count):
-        built(false), max(max), alpha(alpha), count(count), data(){}
+            built(false), max(max), alpha(alpha), count(count), data(){
+        // Generate a pseudo random seed value
+        std::random_device rd;
+        seed = rd();
+    }
+
+    zipf_generator::zipf_generator(uint64_t max, double alpha, size_t count, uint64_t seed):
+        built(false), max(max), alpha(alpha), count(count), seed(seed), data(){
+    };
 
     // Adapted C Zipf Generator from: https://stackoverflow.com/a/48279287/4945380
     void zipf_generator::build() {
@@ -35,7 +43,7 @@ namespace generators{
 
         // Pull a uniform random number (0 < z < 1)
         std::random_device rd;
-        std::mt19937 gen(rd());
+        std::mt19937 gen(seed);
         std::uniform_real_distribution<> dis(0.0, 1.0);
 
         // Generate the random numbers

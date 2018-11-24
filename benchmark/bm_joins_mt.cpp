@@ -11,6 +11,9 @@
 #include "generators/incremental_generator.h"
 #include "generators/zipf_generator.h"
 
+/// The fixed seed used for benchmarking purposes
+#define SEED 0
+
 namespace {
 
     /**
@@ -37,7 +40,7 @@ namespace {
             build = gen0.get_vec_copy();
             // Uniform Distribution
             if (state.range(3) == 0) {
-                generators::uniform_generator gen1(1, data_size_l, data_size_r);
+                generators::uniform_generator gen1(1, data_size_l, data_size_r, SEED);
                 gen1.build();
                 probe = gen1.get_vec_copy();
             }
@@ -45,7 +48,7 @@ namespace {
             else {
                 // Zipf Alpha
                 double alpha = state.range(4) * 0.25;
-                generators::zipf_generator gen1(10000, alpha, data_size_r);
+                generators::zipf_generator gen1(10000, alpha, data_size_r, SEED);
                 gen1.build();
                 probe = gen1.get_vec_copy();
             }
@@ -96,7 +99,7 @@ namespace {
             build = gen0.get_vec_copy();
             // Uniform Distribution
             if (state.range(5) == 0) {
-                generators::uniform_generator gen1(1, data_size_l, data_size_r);
+                generators::uniform_generator gen1(1, data_size_l, data_size_r, SEED);
                 gen1.build();
                 probe = gen1.get_vec_copy();
             }
@@ -104,7 +107,7 @@ namespace {
             else {
                 // Zipf Alpha
                 double alpha = state.range(6) * 0.25;
-                generators::zipf_generator gen1(10000, alpha, data_size_r);
+                generators::zipf_generator gen1(10000, alpha, data_size_r, SEED);
                 gen1.build();
                 probe = gen1.get_vec_copy();
             }

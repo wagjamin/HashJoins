@@ -8,12 +8,19 @@
 namespace generators {
 
     uniform_generator::uniform_generator(size_t min, uint64_t max, uint64_t count):
-            built(false), min(min), max(max), count (count), data() {}
+            built(false), min(min), max(max), count (count), data() {
+        // Generate a pseudo random seed value
+        std::random_device rd;
+        seed = rd();
+    }
+
+    uniform_generator::uniform_generator(size_t min, uint64_t max, uint64_t count, uint64_t seed):
+            built(false), min(min), max(max), count (count), seed(seed), data()
+    {}
 
     void uniform_generator::build() {
 
-        std::random_device rd;
-        std::mt19937 gen(rd());
+        std::mt19937 gen(seed);
         std::uniform_int_distribution<uint64_t> dis(min, max);
         data.reserve(count);
         built = true;
