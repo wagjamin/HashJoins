@@ -6,6 +6,7 @@ set(SRC_LIB_H
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/radix_join.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/nop_join_mt.h"
+        "${CMAKE_SOURCE_DIR}/joins/include/algorithms/hash_helpers.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/mt_radix/radix_join_mt.h"
         "${CMAKE_SOURCE_DIR}/joins/include/algorithms/mt_radix/radix_tasks.h"
         "${CMAKE_SOURCE_DIR}/joins/lib/ThreadPool.h"

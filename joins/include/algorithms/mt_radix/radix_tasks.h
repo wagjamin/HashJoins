@@ -11,6 +11,7 @@
 #include <vector>
 #include <atomic>
 #include "ThreadPool.h"
+#include "algorithms/hash_helpers.h"
 
 /**
  * This file contains a variety of tasks used within the radix join which
@@ -61,10 +62,6 @@ namespace algorithms{
         std::atomic<uint64_t> join_count;
         /// Expected number of last level join operations
         uint64_t join_exp;
-
-        /// Hash function used throughout the partition phase
-        uint64_t hash1(uint64_t val);
-
     };
 
     struct task{

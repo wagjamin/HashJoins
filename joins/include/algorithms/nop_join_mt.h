@@ -5,6 +5,7 @@
 #ifndef HASHJOINS_NOP_JOIN_MT_H
 #define HASHJOINS_NOP_JOIN_MT_H
 
+#include "algorithms/hash_helpers.h"
 #include <memory>
 #include <vector>
 #include <tuple>
@@ -57,15 +58,12 @@ namespace algorithms{
         /// Result vector into which the final triples get written
         std::vector<std::vector<triple>> result;
 
-        /// Private minimal hash table implementation
-        struct hash_table;
-
         /**
          * Builds a fraction of the left table, used in multi threaded setting
          * @param start   start index of the section of the left table that should be built (inclusive)
          * @param end     end index of the section of the left table that should be built (exclusive)
          */
-        void build(uint64_t start, uint64_t end, hash_table* table);
+        void build(uint64_t start, uint64_t end, helpers::latched_hash_table* table);
 
         /**
          * Probes with a fraction of the right table, used in multi threaded setting
@@ -74,10 +72,7 @@ namespace algorithms{
          * @param table   pointer to the hash table used for probing
          * @param t_num   thread index needed for output coordination
          */
-        void probe(uint64_t start, uint64_t end, hash_table* table, uint8_t t_num);
-
-        /// Hash function used for build process
-        uint64_t hash(uint64_t val);
+        void probe(uint64_t start, uint64_t end, helpers::latched_hash_table* table, uint8_t t_num);
 
 
     };

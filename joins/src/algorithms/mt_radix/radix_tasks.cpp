@@ -7,18 +7,6 @@
 
 namespace algorithms{
 
-    // Hash functions used throughout the radix join
-    uint64_t task_context::hash1(uint64_t val) {
-        // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
-        // Implications on Query Processing" by Richter et al
-        val ^= val >> 33;
-        val *= 0xff51afd7ed558ccd;
-        val ^= val >> 33;
-        val *= 0xc4ceb9fe1a85ec53;
-        val ^= val >> 33;
-        return val;
-    }
-
     task_context::task_context(uint8_t radix_bits, uint8_t radix_passes, uint8_t thread_count, double table_size,
                                ThreadPool *pool, std::vector<std::vector<triple>>& results):
         radix_bits(radix_bits), radix_passes(radix_passes), thread_count(thread_count), table_size(table_size),
@@ -44,7 +32,7 @@ namespace algorithms{
         // Build histogram for the left relation
         for (uint64_t k = 0; k < size_l; ++k) {
             tuple &curr = data_l[k];
-            uint64_t hash = context->hash1(std::get<0>(curr));
+            uint64_t hash = helpers::murmur3(std::get<0>(curr));
             // We only care about the specific partition's bits
             uint64_t value = static_cast<uint64_t>(hash & pattern) >> shiftback;
             // Increment histogram value
@@ -53,7 +41,7 @@ namespace algorithms{
         // Build histogram for the right relation
         for (uint64_t k = 0; k < size_r; ++k) {
             tuple &curr = data_r[k];
-            uint64_t hash = context->hash1(std::get<0>(curr));
+            uint64_t hash = helpers::murmur3(std::get<0>(curr));
             // We only care about the specific partition's bits
             uint64_t value = static_cast<uint64_t>(hash & pattern) >> shiftback;
             // Increment histogram value
@@ -94,7 +82,7 @@ namespace algorithms{
         // Scatter left relation based on prefix sum
         for(uint64_t k = 0; k < size_l; ++k){
             tuple& curr = data_l[k];
-            uint64_t hash = context->hash1(std::get<0>(curr));
+            uint64_t hash = helpers::murmur3(std::get<0>(curr));
             // We only care about the specific partition's bits
             uint64_t value = static_cast<uint64_t>(hash & pattern) >> shiftback;
             uint64_t write_to = (*sum_l)[value]++;
@@ -103,7 +91,7 @@ namespace algorithms{
         // Scatter right relation based on prefix sum
         for(uint64_t k = 0; k < size_r; ++k){
             tuple& curr = data_r[k];
-            uint64_t hash = context->hash1(std::get<0>(curr));
+            uint64_t hash = helpers::murmur3(std::get<0>(curr));
             // Create bit pattern on which should be filtered
             // We only care about the specific partition's bits
             uint64_t value = static_cast<uint64_t>(hash & pattern) >> shiftback;

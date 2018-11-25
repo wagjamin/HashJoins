@@ -55,9 +55,6 @@ namespace algorithms{
         /// Result vector
         std::vector<triple> result;
 
-        /// Hash function used for radix partitioning
-        inline uint64_t hash1(uint64_t val);
-
         /**
          * Partition parts of the data
          * @param data_s    beginning of the data to be partitioned
@@ -66,8 +63,6 @@ namespace algorithms{
          * @param count     number of elements within the current partition
          */
         void partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count);
-
-        struct hash_table;
 
     };
 

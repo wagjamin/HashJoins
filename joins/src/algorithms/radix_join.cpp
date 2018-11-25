@@ -17,23 +17,13 @@ namespace algorithms{
                                                table_size(table_size), part_bits(part_bits),
                                                part_count(static_cast<uint32_t>(1) << part_bits), built(false) {};
 
-    inline uint64_t radix_join::hash1(uint64_t val) {
-        // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
-        // Implications on Query Processing" by Richter et al
-        val ^= val >> 33;
-        val *= 0xff51afd7ed558ccd;
-        val ^= val >> 33;
-        val *= 0xc4ceb9fe1a85ec53;
-        val ^= val >> 33;
-        return val;
-    }
 
     void radix_join::partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count) {
         // Pattern filtering the bits we are looking at
         uint64_t pattern = part_count - 1;
         // Create histogram of the hash values
         for(uint64_t i = 0; i < count; ++i){
-            uint64_t index = (hash1(std::get<0>(data_s[i])) & pattern);
+            uint64_t index = (helpers::murmur3(std::get<0>(data_s[i])) & pattern);
             hist[index]++;
         }
         // Build prefix sum
@@ -46,7 +36,7 @@ namespace algorithms{
         }
         // Scatter tuples into destination
         for(uint64_t i = 0; i < count; ++i){
-            uint64_t index = (hash1(std::get<0>(data_s[i])) & pattern);
+            uint64_t index = (helpers::murmur3(std::get<0>(data_s[i])) & pattern);
             uint64_t write_to = hist[index]++;
             data_t[write_to] = data_s[i];
         }

@@ -7,37 +7,6 @@
 
 namespace algorithms{
 
-    /// Simple chained hash table used within the nop join
-    struct nop_join::hash_table{
-        /// One of the hash table entries
-        struct bucket{
-
-            /// Overflow bucket used for chaining
-            struct overflow{
-                tuple t;
-                std::unique_ptr<overflow> next;
-
-                overflow(tuple t): t(t){}
-            };
-
-            uint32_t count;
-            tuple t1;
-            tuple t2;
-            std::unique_ptr<overflow> next;
-
-            /// Default constructor
-            bucket(): count(0), next(nullptr) {}
-
-        };
-
-        std::unique_ptr<bucket[]> arr;
-
-        explicit hash_table(uint64_t size){
-            arr = std::make_unique<bucket[]>(size);
-        }
-
-    };
-
     nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r):
             nop_join(left, right, size_l, size_r, 1.5){}
 
@@ -57,12 +26,12 @@ namespace algorithms{
             return;
         }
         auto new_size = static_cast<uint64_t>(1.5 * size_l);
-        hash_table table = hash_table(new_size);
+        helpers::hash_table table = helpers::hash_table(new_size);
         // Build Phase
         for(uint64_t k = 0; k < size_l; ++k){
             tuple& curr = left[k];
-            uint64_t index = hash(std::get<0>(curr)) % new_size;
-            hash_table::bucket& bucket = table.arr[index];
+            uint64_t index = helpers::murmur3(std::get<0>(curr)) % new_size;
+            helpers::hash_table::bucket& bucket = table.arr[index];
             switch(bucket.count){
                 case 0:
                     bucket.t1 = curr;
@@ -71,16 +40,16 @@ namespace algorithms{
                     bucket.t2 = curr;
                     break;
                 case 2:
-                    bucket.next = std::make_unique<hash_table::bucket::overflow>(curr);
+                    bucket.next = std::make_unique<helpers::overflow>(curr);
                     break;
                 default:
-                    hash_table::bucket::overflow* ptr = bucket.next.get();
+                    helpers::overflow* ptr = bucket.next.get();
                     // Follow pointer indirection
                     for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 3); i++){
                         ptr = ptr->next.get();
                     }
                     // Create new bucket containing tuple
-                    ptr->next = std::make_unique<hash_table::bucket::overflow>(curr);
+                    ptr->next = std::make_unique<helpers::overflow>(curr);
             }
             ++bucket.count;
         }
@@ -88,11 +57,11 @@ namespace algorithms{
         built = true;
         for(uint64_t k = 0; k < size_r; ++k){
             tuple& curr = right[k];
-            uint64_t index = hash(std::get<0>(curr)) % new_size;
-            hash_table::bucket& bucket = table.arr[index];
+            uint64_t index = helpers::murmur3(std::get<0>(curr)) % new_size;
+            helpers::hash_table::bucket& bucket = table.arr[index];
             // Follow overflow buckets
             if(bucket.count > 2){
-                hash_table::bucket::overflow* curr_over = bucket.next.get();
+                helpers::overflow* curr_over = bucket.next.get();
                 for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 2); ++i){
                     if(std::get<0>(curr_over->t) == std::get<0>(curr)){
                         result.emplace_back(std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr));
@@ -123,17 +92,6 @@ namespace algorithms{
         result = std::move(res_vec);
         // Set built to false again, since data was not built into the new vector
         built = false;
-    }
-
-    uint64_t nop_join::hash(uint64_t val) {
-        // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
-        // Implications on Query Processing" by Richter et al
-        val ^= val >> 33;
-        val *= 0xff51afd7ed558ccd;
-        val ^= val >> 33;
-        val *= 0xc4ceb9fe1a85ec53;
-        val ^= val >> 33;
-        return val;
     }
 
 } // namespace algorithms

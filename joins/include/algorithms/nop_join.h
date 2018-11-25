@@ -5,6 +5,7 @@
 #ifndef HASHJOINS_NOP_JOIN_H
 #define HASHJOINS_NOP_JOIN_H
 
+#include "algorithms/hash_helpers.h"
 #include <memory>
 #include <vector>
 #include <tuple>
@@ -54,10 +55,6 @@ namespace algorithms{
         bool built;
         /// Result vector
         std::vector<triple> result;
-
-        struct hash_table;
-
-        uint64_t hash(uint64_t val);
 
     };
 
