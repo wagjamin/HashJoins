@@ -50,6 +50,6 @@ namespace generators{
         std::vector<std::tuple<uint64_t, uint64_t>> data;
     };
 
-} // namespace generators
+}  // namespace generators
 
-#endif //HASHJOINS_UNIFORM_GENERATOR_H
+#endif  // HASHJOINS_UNIFORM_GENERATOR_H

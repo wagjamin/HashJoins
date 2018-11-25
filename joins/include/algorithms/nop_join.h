@@ -5,16 +5,15 @@
 #ifndef HASHJOINS_NOP_JOIN_H
 #define HASHJOINS_NOP_JOIN_H
 
-#include "algorithms/hash_helpers.h"
 #include <memory>
 #include <vector>
 #include <tuple>
+#include "algorithms/hash_helpers.h"
 
-namespace algorithms{
+namespace algorithms {
 
     /// Single threaded no partitioning join
     class nop_join {
-
     public:
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
@@ -55,9 +54,8 @@ namespace algorithms{
         bool built;
         /// Result vector
         std::vector<triple> result;
-
     };
 
-} // namespace algorithms
+}  // namespace algorithms
 
-#endif //HASHJOINS_NOP_JOIN_H
+#endif  // HASHJOINS_NOP_JOIN_H

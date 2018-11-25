@@ -7,8 +7,9 @@
 
 #include <memory>
 #include <mutex>
+#include <tuple>
 
-namespace helpers{
+namespace helpers {
 
     /// Murmur 3 hash function for 64 bit uint keys, inline to keep all in header file
     inline uint64_t murmur3(uint64_t val) {
@@ -26,16 +27,15 @@ namespace helpers{
     typedef std::tuple<uint64_t, uint64_t> tuple;
 
     /// Overflow bucket used for chaining
-    struct overflow{
+    struct overflow {
         tuple t;
         std::unique_ptr<overflow> next;
 
-        overflow(tuple t): t(t){}
+        explicit overflow(tuple t): t(t){}
     };
 
     /// Chained Hash Table used for ST No Partitioning Join, every bucket is protected with a latch
     struct latched_hash_table{
-
         /// One of the hash table entries
         struct bucket{
             std::mutex lock;
@@ -46,7 +46,6 @@ namespace helpers{
 
             /// Default constructor
             bucket(): count(0), next(nullptr) {}
-
         };
 
         std::unique_ptr<bucket[]> arr;
@@ -54,13 +53,11 @@ namespace helpers{
 
         explicit latched_hash_table(uint64_t size): size(size){
                 arr = std::make_unique<bucket[]>(size);
-        };
-
+        }
     };
 
     /// Simple chained hash table used within the nop join
     struct hash_table{
-
         /// One of the hash table entries
         struct bucket{
             uint32_t count;
@@ -70,7 +67,6 @@ namespace helpers{
 
             /// Default constructor
             bucket(): count(0), next(nullptr) {}
-
         };
 
         std::unique_ptr<bucket[]> arr;
@@ -78,10 +74,11 @@ namespace helpers{
 
         explicit hash_table(uint64_t size): size(size){
             arr = std::make_unique<bucket[]>(size);
-        };
+        }
 
     };
 
-} // namespace helpers
+}  // namespace helpers
 
-#endif //HASHJOINS_HASH_HELPERS_H
+
+#endif  // HASHJOINS_HASH_HELPERS_H

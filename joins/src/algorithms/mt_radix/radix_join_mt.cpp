@@ -11,8 +11,7 @@ namespace algorithms{
 
     radix_join_mt::radix_join_mt(radix_join_mt::tuple *left, tuple *right, uint64_t size_l, uint64_t size_r,
                                  uint8_t bits_per_pass, uint8_t passes):
-                radix_join_mt(left, right, size_l, size_r, 1.5, 4, bits_per_pass, passes)
-    {}
+                radix_join_mt(left, right, size_l, size_r, 1.5, 4, bits_per_pass, passes) {}
 
     radix_join_mt::radix_join_mt(radix_join_mt::tuple *left, tuple *right, uint64_t size_l, uint64_t size_r,
                                  double table_size, uint8_t threads, uint8_t bits_per_pass, uint8_t passes):

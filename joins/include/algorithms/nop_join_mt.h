@@ -5,16 +5,15 @@
 #ifndef HASHJOINS_NOP_JOIN_MT_H
 #define HASHJOINS_NOP_JOIN_MT_H
 
-#include "algorithms/hash_helpers.h"
 #include <memory>
 #include <vector>
 #include <tuple>
+#include "algorithms/hash_helpers.h"
 
 namespace algorithms{
 
     /// Fully fledged NOP-Join implementation
-    class nop_join_mt{
-
+    class nop_join_mt {
     public:
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
@@ -73,10 +72,8 @@ namespace algorithms{
          * @param t_num   thread index needed for output coordination
          */
         void probe(uint64_t start, uint64_t end, helpers::latched_hash_table* table, uint8_t t_num);
-
-
     };
 
-}; // namespace algorithms
+};  // namespace algorithms
 
-#endif //HASHJOINS_NOP_JOIN_MT_H
+#endif  // HASHJOINS_NOP_JOIN_MT_H

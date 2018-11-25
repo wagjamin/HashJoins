@@ -9,7 +9,7 @@
 #include <vector>
 #include <tuple>
 
-namespace generators{
+namespace generators {
 
     /**
      * Generates zipf distributed data within a certain range.
@@ -19,7 +19,7 @@ namespace generators{
      * do not follow a certain distribution (since they are not relevant
      * to the join itself).
      */
-    class zipf_generator{
+    class zipf_generator {
 
     public:
         /**
@@ -55,6 +55,6 @@ namespace generators{
         std::vector<std::tuple<uint64_t, uint64_t>> data;
     };
 
-}
+}  // namespace generators
 
-#endif //HASHJOINS_ZIPF_GENERATOR_H
+#endif  // HASHJOINS_ZIPF_GENERATOR_H

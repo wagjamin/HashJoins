@@ -12,8 +12,7 @@
 namespace algorithms{
 
     /// Fully fledged multi-threaded radix join
-    class radix_join_mt{
-
+    class radix_join_mt {
     public:
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
@@ -59,6 +58,6 @@ namespace algorithms{
         uint8_t passes;
     };
 
-}; // namespace algorithms
+};  // namespace algorithms
 
-#endif //HASHJOINS_RADIX_JOIN_MT_H
+#endif  // HASHJOINS_RADIX_JOIN_MT_H

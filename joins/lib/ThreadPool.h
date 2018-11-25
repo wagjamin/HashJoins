@@ -58,12 +58,10 @@ private:
 
 // the constructor just launches some amount of workers
 inline ThreadPool::ThreadPool(size_t threads)
-        :   stop(false)
-{
+        :   stop(false) {
     for(size_t i = 0;i<threads;++i)
         workers.emplace_back(
-                [this]
-                {
+                [this] {
                     for(;;)
                     {
                         std::function<void()> task;

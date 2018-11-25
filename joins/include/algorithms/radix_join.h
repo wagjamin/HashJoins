@@ -9,11 +9,10 @@
 #include <vector>
 #include <tuple>
 
-namespace algorithms{
+namespace algorithms {
 
     /// Single threaded single partition radix join
     class radix_join {
-
     public:
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
@@ -63,10 +62,9 @@ namespace algorithms{
          * @param count     number of elements within the current partition
          */
         void partition(tuple* data_s, tuple* data_t, uint64_t* hist, uint64_t count);
-
     };
 
-} // namespace algorithms
+}  // namespace algorithms
 
 
-#endif //HASHJOINS_RADIX_JOIN_H
+#endif  // HASHJOINS_RADIX_JOIN_H

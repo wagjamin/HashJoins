@@ -8,7 +8,7 @@
 #include <vector>
 #include <tuple>
 
-namespace generators{
+namespace generators {
 
     /**
      * Generates an incremental set of tuples from within a range.
@@ -16,8 +16,7 @@ namespace generators{
      * do not follow a certain distribution (since they are not relevant
      * to the join itself).
      */
-    class incremental_generator{
-
+    class incremental_generator {
     public:
         /**
          * Initializes the uniform number generator. The first tuple will have value start, then ext one start + 1
@@ -44,7 +43,7 @@ namespace generators{
         std::vector<std::tuple<uint64_t, uint64_t>> data;
     };
 
-} // namespace generators
+}  // namespace generators
 
 
-#endif //HASHJOINS_INCREMENTAL_GENERATOR_H
+#endif  // HASHJOINS_INCREMENTAL_GENERATOR_H

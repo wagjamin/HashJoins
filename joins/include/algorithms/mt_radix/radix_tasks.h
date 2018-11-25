@@ -10,18 +10,19 @@
 #include <condition_variable>
 #include <vector>
 #include <atomic>
-#include "ThreadPool.h"
+#include <tuple>
+#include <utility>
 #include "algorithms/hash_helpers.h"
+#include "ThreadPool.h"
 
 /**
  * This file contains a variety of tasks used within the radix join which
  * are ultimately added to the thread pool.
  */
-namespace algorithms{
+namespace algorithms {
 
     /// Helper struct containing basic information about the executed radix join
-    struct task_context{
-
+    struct task_context {
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
         /// Join result, containing (join_val, rid_left, rid_right)
@@ -64,7 +65,7 @@ namespace algorithms{
         uint64_t join_exp;
     };
 
-    struct task{
+    struct task {
         /// First element is the value on which should be joined, second one the rid
         typedef std::tuple<uint64_t, uint64_t> tuple;
         /// Join result, containing (join_val, rid_left, rid_right)
@@ -72,8 +73,7 @@ namespace algorithms{
     };
 
     /// Creates histograms of the hash values within the given partition
-    struct partition_task: task{
-
+    struct partition_task: task {
         /// Perform the actual operation, returns a histogram of left and right partition
         static std::pair<std::shared_ptr<std::vector<uint64_t>>, std::shared_ptr<std::vector<uint64_t>>> execute(
                 task_context* context, bool spawn, uint8_t curr_depth, tuple* data_l, tuple* data_r,
@@ -81,8 +81,7 @@ namespace algorithms{
     };
 
     /// Scatters data from a given partition into destination based on histograms
-    struct scatter_task: task{
-
+    struct scatter_task: task {
         /// Perform the actual operation, no return value needed
         static bool execute(task_context* context, bool spawn, uint8_t curr_depth, std::shared_ptr<std::vector<uint64_t>> sum_l,
                      std::shared_ptr<std::vector<uint64_t>> sum_r, tuple* data_l, tuple* data_r, uint64_t size_l,
@@ -90,11 +89,10 @@ namespace algorithms{
     };
 
     /// Performs the actual join on given data
-    struct join_task: task{
-
+    struct join_task: task {
         static void execute(task_context* context, tuple* data_l, tuple* data_r, uint64_t size_l, uint64_t size_r);
     };
 
-} // namespace algorithms
+}  // namespace algorithms
 
-#endif //HASHJOINS_RADIX_TASKS_H
+#endif  // HASHJOINS_RADIX_TASKS_H

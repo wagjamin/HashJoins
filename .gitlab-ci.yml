@@ -47,6 +47,7 @@ cpplint:
     tags:
         - "cmake"
         - "python3"
+    allow_failure: true
 
 clear_cache:
     stage: cleanup
