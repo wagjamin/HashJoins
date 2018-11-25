@@ -21,10 +21,10 @@ using namespace algorithms; // NOLINT
  * Helper function. Takes the vector of output vectors and calculates the total length
  * of the output.
  */
-uint64_t get_size(std::vector<std::shared_ptr<std::vector<radix_join_mt::triple>>>* output){
+uint64_t get_size_radix(std::vector<std::vector<radix_join_mt::triple>> &output){
     uint64_t size = 0;
-    for(auto& elem: (*output)){
-        size += (*elem).size();
+    for(auto& vec: output){
+        size += vec.size();
     }
     return size;
 }
@@ -56,7 +56,7 @@ TEST(RadixTestMT, NoResTesterSTSP) {
     auto right = gen.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, 1, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), 0);
+    ASSERT_EQ(get_size_radix(join.get()), 0);
 }
 
 // This is a simple cross product
@@ -70,7 +70,7 @@ TEST(RadixTestMT, CrossTester1STSP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, 1, 1.5, 1, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count);
+    ASSERT_EQ(get_size_radix(join.get()), count);
 }
 
 
@@ -84,7 +84,7 @@ TEST(RadixTestMT, CrossTester2STSP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, 1, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count*count);
+    ASSERT_EQ(get_size_radix(join.get()), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -105,8 +105,8 @@ TEST(RadixTestMT, StatisticalTesterSTSP){
     std::cout << "MT Radix Join Time Single Threaded Single Pass: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, get_size(join.get().get()));
-    ASSERT_GE(1.05 * expected, get_size(join.get().get()));
+    ASSERT_LE(0.95 * expected, get_size_radix(join.get()));
+    ASSERT_GE(1.05 * expected, get_size_radix(join.get()));
 }
 
 
@@ -126,7 +126,7 @@ TEST(RadixTestMT, NoResTesterMTSP) {
     auto right = gen.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), 0);
+    ASSERT_EQ(get_size_radix(join.get()), 0);
 }
 
 // This is a simple cross product
@@ -140,7 +140,7 @@ TEST(RadixTestMT, CrossTester1MTSP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count);
+    ASSERT_EQ(get_size_radix(join.get()), count);
 }
 
 
@@ -154,7 +154,7 @@ TEST(RadixTestMT, CrossTester2MTSP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, 8, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count*count);
+    ASSERT_EQ(get_size_radix(join.get()), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -175,8 +175,8 @@ TEST(RadixTestMT, StatisticalTesterMTSP){
     std::cout << "MT Radix Join Time Multi Threaded Single Pass: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, get_size(join.get().get()));
-    ASSERT_GE(1.05 * expected, get_size(join.get().get()));
+    ASSERT_LE(0.95 * expected, get_size_radix(join.get()));
+    ASSERT_GE(1.05 * expected, get_size_radix(join.get()));
 }
 
 
@@ -196,7 +196,7 @@ TEST(RadixTestMT, NoResTesterMTMP) {
     auto right = gen.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, part_bits, part_runs);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), 0);
+    ASSERT_EQ(get_size_radix(join.get()), 0);
 }
 
 // This is a simple cross product
@@ -210,7 +210,7 @@ TEST(RadixTestMT, CrossTester1MTMP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count, part_bits, part_runs);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count);
+    ASSERT_EQ(get_size_radix(join.get()), count);
 }
 
 
@@ -224,7 +224,7 @@ TEST(RadixTestMT, CrossTester2MTMP) {
     auto right = uni.get_vec_copy();
     radix_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count, part_bits, part_runs);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count*count);
+    ASSERT_EQ(get_size_radix(join.get()), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -245,6 +245,6 @@ TEST(RadixTestMT, StatisticalTesterMTMP){
     std::cout << "MT Radix Join Time Multi Threaded Multi Pass: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, get_size(join.get().get()));
-    ASSERT_GE(1.05 * expected, get_size(join.get().get()));
+    ASSERT_LE(0.95 * expected, get_size_radix(join.get()));
+    ASSERT_GE(1.05 * expected, get_size_radix(join.get()));
 }

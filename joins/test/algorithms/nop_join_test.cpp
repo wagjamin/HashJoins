@@ -38,7 +38,7 @@ TEST(NopTest, NoResTester) {
 
     nop_join join(left.data(), right.data(), count, count, 1.5);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), 0);
+    ASSERT_EQ(join.get().size(), 0);
 }
 
 // This is a simple cross product
@@ -52,7 +52,7 @@ TEST(NopTest, CrossTester1) {
     auto right = uni.get_vec_copy();
     nop_join join(left.data(), right.data(), count, 1, 1.5);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), count);
+    ASSERT_EQ(join.get().size(), count);
 }
 
 
@@ -66,7 +66,7 @@ TEST(NopTest, CrossTester2) {
     auto right = uni.get_vec_copy();
     nop_join join(left.data(), right.data(), count, count, 1.5);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), count*count);
+    ASSERT_EQ(join.get().size(), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -87,8 +87,8 @@ TEST(NopTest, StatisticalTester){
     std::cout << "ST NOP Join Time: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, (*join.get()).size());
-    ASSERT_GE(1.05 * expected, (*join.get()).size());
+    ASSERT_LE(0.95 * expected, join.get().size());
+    ASSERT_GE(1.05 * expected, join.get().size());
 }
 
 

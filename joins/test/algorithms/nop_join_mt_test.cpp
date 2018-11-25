@@ -18,9 +18,9 @@ using namespace algorithms; // NOLINT
  * Helper function. Takes the vector of output vectors and calculates the total length
  * of the output.
  */
-uint64_t get_size(std::vector<std::vector<nop_join_mt::triple>>* output){
+uint64_t get_size_nop(std::vector<std::vector<nop_join_mt::triple>> &output){
     uint64_t size = 0;
-    for(auto& vec: (*output)){
+    for(auto& vec: output){
         size += vec.size();
     }
     return size;
@@ -52,7 +52,7 @@ TEST(NopTestMT, NoResTesterST) {
     auto right = gen.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, count, 1.5, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), 0);
+    ASSERT_EQ(get_size_nop(join.get()), 0);
 }
 
 // This is a simple cross product
@@ -66,7 +66,7 @@ TEST(NopTestMT, CrossTester1ST) {
     auto right = uni.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, 1, 1.5, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count);
+    ASSERT_EQ(get_size_nop(join.get()), count);
 }
 
 
@@ -80,7 +80,7 @@ TEST(NopTestMT, CrossTester2ST) {
     auto right = uni.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, count, 1.5, 1);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count*count);
+    ASSERT_EQ(get_size_nop(join.get()), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -101,8 +101,8 @@ TEST(NopTestMT, StatisticalTesterST){
     std::cout << "MT NOP Join Time Single Threaded: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, get_size(join.get().get()));
-    ASSERT_GE(1.05 * expected, get_size(join.get().get()));
+    ASSERT_LE(0.95 * expected, get_size_nop(join.get()));
+    ASSERT_GE(1.05 * expected, get_size_nop(join.get()));
 }
 
 // Ensure proper creation of object and no return before execution
@@ -131,7 +131,7 @@ TEST(NopTestMT, NoResTesterMT) {
     auto right = gen.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), 0);
+    ASSERT_EQ(get_size_nop(join.get()), 0);
 }
 
 // This is a simple cross product
@@ -145,7 +145,7 @@ TEST(NopTestMT, CrossTester1MT) {
     auto right = uni.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, 1, 1.5, thread_count);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count);
+    ASSERT_EQ(get_size_nop(join.get()), count);
 }
 
 
@@ -159,7 +159,7 @@ TEST(NopTestMT, CrossTester2MT) {
     auto right = uni.get_vec_copy();
     nop_join_mt join(left.data(), right.data(), count, count, 1.5, thread_count);
     join.execute();
-    ASSERT_EQ(get_size(join.get().get()), count*count);
+    ASSERT_EQ(get_size_nop(join.get()), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -180,6 +180,6 @@ TEST(NopTestMT, StatisticalTesterMT){
     std::cout << "MT NOP Join Time Multi Threaded: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, get_size(join.get().get()));
-    ASSERT_GE(1.05 * expected, get_size(join.get().get()));
+    ASSERT_LE(0.95 * expected, get_size_nop(join.get()));
+    ASSERT_GE(1.05 * expected, get_size_nop(join.get()));
 }

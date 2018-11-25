@@ -17,14 +17,7 @@ namespace algorithms{
     radix_join_mt::radix_join_mt(radix_join_mt::tuple *left, tuple *right, uint64_t size_l, uint64_t size_r,
                                  double table_size, uint8_t threads, uint8_t bits_per_pass, uint8_t passes):
             left(left), right(right), size_l(size_l), size_r(size_r), table_size(table_size), threads(threads),
-            built(false), result(std::make_shared<std::vector<std::shared_ptr<std::vector<triple>>>>(threads)),
-            bits_per_pass(bits_per_pass), passes(passes)
-    {
-        // Create the actual output vectors used by the radix join
-        for(auto& ptr: *result){
-            ptr = std::make_shared<std::vector<triple>>();
-        }
-    }
+            built(false), result(threads), bits_per_pass(bits_per_pass), passes(passes) {}
 
     // Run the actual radix join using the tools from radix_task
     void radix_join_mt::execute() {
@@ -142,10 +135,18 @@ namespace algorithms{
         pool.finish();
     }
 
-    radix_join_mt::result_vec radix_join_mt::get() {
+    std::vector<std::vector<radix_join_mt::triple>>& radix_join_mt::get(){
         if(!built){
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;
     }
+
+    void radix_join_mt::set(std::vector<std::vector<radix_join_mt::triple>> &res_vec) {
+        // The vector is moved for maximum performance. The vector cannot be used by the caller afterwards.
+        result = std::move(res_vec);
+        // Set built to false again, since data was not built into the new vector
+        built = false;
+    }
+
 } // namespace algorithms

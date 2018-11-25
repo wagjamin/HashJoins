@@ -25,14 +25,18 @@ namespace algorithms{
         /// Join constructor with additional parameter
         nop_join_mt(tuple* left, tuple* right,
                 uint64_t size_l, uint64_t size_r, double table_size, uint8_t threads);
+
         /// Performs the actual join and writes result
         void execute();
 
         /// Set the result vector into which data should be written
         void set_res(std::shared_ptr<std::vector<triple>> res);
 
-        /// Returns a pointer to the result vectors
-        std::shared_ptr<std::vector<std::vector<triple>>> get();
+        /// Returns a reference to the result vectors
+        std::vector<std::vector<triple>>& get();
+
+        /// Pass a result vector to the join, will be moved and may not be used further by the caller
+        void set(std::vector<std::vector<triple>>& res_vec);
 
 
     private:
@@ -50,8 +54,8 @@ namespace algorithms{
         uint8_t threads;
         /// Boolean flag indicating whether build was already called
         bool built;
-        /// Pointer to the result vectors created by different partitions
-        std::shared_ptr<std::vector<std::vector<triple>>> result;
+        /// Result vector into which the final triples get written
+        std::vector<std::vector<triple>> result;
 
         /// Private minimal hash table implementation
         struct hash_table;

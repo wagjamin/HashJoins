@@ -15,7 +15,7 @@ namespace algorithms{
     radix_join::radix_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r, double table_size,
                            uint8_t part_bits): left(left), right(right), size_l(size_l), size_r(size_r),
                                                table_size(table_size), part_bits(part_bits),
-                                               part_count(static_cast<uint32_t>(1) << part_bits), result(nullptr) {};
+                                               part_count(static_cast<uint32_t>(1) << part_bits), built(false) {};
 
     inline uint64_t radix_join::hash1(uint64_t val) {
         // Murmur 3 taken from "A Seven-Dimensional Analysis of Hashing Methods and its
@@ -53,7 +53,7 @@ namespace algorithms{
     }
 
     void radix_join::execute() {
-        result = std::make_shared<std::vector<triple>>();
+        built = true;
         // No results on empty datasets
         if(size_l == 0 || size_r == 0){
             return;
@@ -83,18 +83,28 @@ namespace algorithms{
             end_r = hist_r[part];
             // Perform standard NOP-Join on partitions
             if(start_l != end_l && start_r != end_r){
+                // Pass result vector to the No partitioning join
                 nop_join join(list_l.get() + start_l, list_r.get() + start_r, end_l - start_l,
                               end_r - start_r, table_size, result);
                 join.execute();
+                // Reclaim result vector
+                result = std::move(join.get());
             }
         }
     }
 
-    std::shared_ptr<std::vector<radix_join::triple>> radix_join::get() {
-        if(result == nullptr){
+    std::vector<radix_join::triple>& radix_join::get() {
+        if(!built){
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;
+    }
+
+    void radix_join::set(std::vector<radix_join::triple> &res_vec) {
+        // The vector is moved for maximum performance. The vector cannot be used by the caller afterwards.
+        result = std::move(res_vec);
+        // Set built to false again, since data was not built into the new vector
+        built = false;
     }
 
 } // namespace algorithms

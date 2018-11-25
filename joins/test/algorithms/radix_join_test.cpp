@@ -39,7 +39,7 @@ TEST(RadTest, NoResTester) {
     auto right = gen.get_vec_copy();
     radix_join join(left.data(), right.data(), count, count, 1.5, 6);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), 0);
+    ASSERT_EQ(join.get().size(), 0);
 }
 
 // This is a simple cross product
@@ -53,7 +53,7 @@ TEST(RadTest, CrossTester1) {
     auto right = uni.get_vec_copy();
     radix_join join(left.data(), right.data(), count, 1, 1.5, 6);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), count);
+    ASSERT_EQ(join.get().size(), count);
 }
 
 
@@ -67,7 +67,7 @@ TEST(RadTest, CrossTester2) {
     auto right = uni.get_vec_copy();
     radix_join join(left.data(), right.data(), count, count, 1.5, 6);
     join.execute();
-    ASSERT_EQ((*join.get()).size(), count*count);
+    ASSERT_EQ(join.get().size(), count*count);
 }
 
 // Statistical test, usually should not fail
@@ -88,6 +88,6 @@ TEST(RadTest, StatisticalTester){
     std::cout << "ST Radix Join Time: " << duration << " milliseconds.\n";
     // Expected overall amount of join partners
     auto expected = static_cast<uint64_t>(max * (static_cast<double>(count)/max) * static_cast<double>((count))/max);
-    ASSERT_LE(0.95 * expected, (*join.get()).size());
-    ASSERT_GE(1.05 * expected, (*join.get()).size());
+    ASSERT_LE(0.95 * expected, join.get().size());
+    ASSERT_GE(1.05 * expected, join.get().size());
 }

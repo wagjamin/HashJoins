@@ -19,11 +19,6 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t> tuple;
         /// Join result, containing (join_val, rid_left, rid_right)
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
-        /***
-        * We sadly need this unwieldy construction of types to reuse our original
-        * nop_join implementation. Might change that in the future
-        */
-        typedef std::shared_ptr<std::vector<std::shared_ptr<std::vector<triple>>>> result_vec;
 
         /// Basic constructor
         radix_join_mt(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
@@ -35,11 +30,11 @@ namespace algorithms{
         /// Performs the actual join and writes result
         void execute();
 
-        /// Set the result vector into which data should be written
-        void set_res(result_vec res);
+        /// Returns a reference to the result vectors
+        std::vector<std::vector<triple>>& get();
 
-        /// Returns a pointer to the result vectors.
-        result_vec get();
+        /// Pass a result vector to the join, will be moved and may not be used further by the caller
+        void set(std::vector<std::vector<triple>>& res_vec);
 
     private:
         /// Left join partner
@@ -57,7 +52,7 @@ namespace algorithms{
         /// Boolean flag indicating whether build was already called
         bool built;
         /// Pointer to the result vectors created by different partitions
-        result_vec result;
+        std::vector<std::vector<triple>> result;
         /// Number of radix bits on which data should be partitioned every pass
         uint8_t bits_per_pass;
         /// Number of partitioning passes that should be performed

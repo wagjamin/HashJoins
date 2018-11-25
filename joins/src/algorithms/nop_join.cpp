@@ -42,10 +42,11 @@ namespace algorithms{
             nop_join(left, right, size_l, size_r, 1.5){}
 
     nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r, double table_size):
-            nop_join(left, right, size_l, size_r, table_size, std::make_shared<std::vector<triple>>()){}
+            left(left), right(right), size_l(size_l), size_r(size_r),
+            table_size(table_size), built(false), result(){}
 
     nop_join::nop_join(tuple* left, tuple* right, uint64_t size_l, uint64_t size_r,
-                       double table_size, std::shared_ptr<std::vector<triple>> result):
+                       double table_size, std::vector<triple>& result):
                                 left(left), right(right), size_l(size_l), size_r(size_r),
                                 table_size(table_size), built(false), result(std::move(result)){}
 
@@ -94,31 +95,34 @@ namespace algorithms{
                 hash_table::bucket::overflow* curr_over = bucket.next.get();
                 for(uint64_t i = 0; i < static_cast<uint64_t>(bucket.count - 2); ++i){
                     if(std::get<0>(curr_over->t) == std::get<0>(curr)){
-                        result->push_back({std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr)});
+                        result.emplace_back(std::get<0>(curr_over->t), std::get<1>(curr_over->t), std::get<1>(curr));
                     }
                     curr_over = curr_over->next.get();
                 }
             }
             // Look at second tuple
             if(bucket.count > 1 && std::get<0>(bucket.t2) == std::get<0>(curr)){
-                result->push_back({std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr)});
+                result.emplace_back(std::get<0>(bucket.t2), std::get<1>(bucket.t2), std::get<1>(curr));
             }
             // Look at first tuple
             if(bucket.count > 0 && std::get<0>(bucket.t1) == std::get<0>(curr)){
-                result->push_back({std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr)});
+                result.emplace_back(std::get<0>(bucket.t1), std::get<1>(bucket.t1), std::get<1>(curr));
             }
         }
     }
 
-    void nop_join::set_res(std::shared_ptr<std::vector<algorithms::nop_join::triple>> res) {
-        result = std::move(res);
-    }
-
-    std::shared_ptr<std::vector<nop_join::triple>> nop_join::get() {
+    std::vector<nop_join::triple>& nop_join::get() {
         if(!built){
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;
+    }
+
+    void nop_join::set(std::vector<nop_join::triple> &res_vec) {
+        // The vector is moved for maximum performance. The vector cannot be used by the caller afterwards.
+        result = std::move(res_vec);
+        // Set built to false again, since data was not built into the new vector
+        built = false;
     }
 
     uint64_t nop_join::hash(uint64_t val) {

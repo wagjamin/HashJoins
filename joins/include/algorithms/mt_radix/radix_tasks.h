@@ -25,14 +25,9 @@ namespace algorithms{
         typedef std::tuple<uint64_t, uint64_t> tuple;
         /// Join result, containing (join_val, rid_left, rid_right)
         typedef std::tuple<uint64_t, uint64_t, uint64_t> triple;
-        /***
-        * We sadly need this unwieldy construction of types to reuse our original
-        * nop_join implementation. Might change that in the future
-        */
-        typedef std::shared_ptr<std::vector<std::shared_ptr<std::vector<triple>>>> result_vec;
 
         task_context(uint8_t radix_bits, uint8_t radix_passes, uint8_t thread_count, double table_size,
-                     ThreadPool* pool, result_vec results);
+                     ThreadPool* pool, std::vector<std::vector<triple>>& results);
 
 
         /// The radix bits per pass
@@ -47,13 +42,13 @@ namespace algorithms{
         ThreadPool* pool;
         /**
          * We need some form of output coordination.
-         * The results vector stores the actual arrays being written to,
+         * The results vector stores the actual targets being written to,
          * while the free_index is used as a stack in order to maintain the currently
          * unused output vectors. The Mutex serves for synchronization on the free_index.
          */
         std::vector<uint8_t> free_index;
         std::mutex output_mutex;
-        result_vec results;
+        std::vector<std::vector<triple>>& results;
         /**
          * We require coordination between the radix_join_mt and the last level
          * join tasks. This is done through a condition variable, where the radix join

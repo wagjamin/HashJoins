@@ -29,9 +29,11 @@ namespace algorithms{
         /// Performs the actual join and writes the result
         void execute();
 
-        /// Returns a pointer to the result vector
-        std::shared_ptr<std::vector<triple>> get();
+        /// Returns a reference to the result vector
+        std::vector<triple>& get();
 
+        /// Pass a result vector to the join, will be moved and may not be used further by the caller
+        void set(std::vector<triple>& res_vec);
 
     private:
         /// Left join partner
@@ -48,8 +50,10 @@ namespace algorithms{
         uint8_t part_bits;
         /// Total number of partitions being created
         uint32_t part_count;
+        /// Boolean flag indicating whether build was already called
+        bool built;
         /// Result vector
-        std::shared_ptr<std::vector<triple>> result;
+        std::vector<triple> result;
 
         /// Hash function used for radix partitioning
         inline uint64_t hash1(uint64_t val);

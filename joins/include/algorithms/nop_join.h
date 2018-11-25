@@ -25,18 +25,18 @@ namespace algorithms{
         /// Join constructor with additional parameter
         nop_join(tuple* left, tuple* right,
                  uint64_t size_l, uint64_t size_r, double table_size);
-        /// Join constructor  offering maximum flexibility
+        /// Join constructor  offering maximum flexibility, 'result' is moved into the join object
         nop_join(tuple* left, tuple* right,
-                 uint64_t size_l, uint64_t size_r, double table_size, std::shared_ptr<std::vector<triple>> result);
+                 uint64_t size_l, uint64_t size_r, double table_size, std::vector<triple>& result);
 
         /// Performs the actual join and writes result
         void execute();
 
-        /// Set the result vector into which data should be written
-        void set_res(std::shared_ptr<std::vector<triple>> res);
+        /// Returns a reference to the result vector
+        std::vector<triple>& get();
 
-        /// Returns a pointer to the result vector
-        std::shared_ptr<std::vector<triple>> get();
+        /// Pass a result vector to the join, will be moved and may not be used further by the caller
+        void set(std::vector<triple>& res_vec);
 
 
     private:
@@ -53,7 +53,7 @@ namespace algorithms{
         /// Boolean flag indicating whether build was already called
         bool built;
         /// Result vector
-        std::shared_ptr<std::vector<triple>> result;
+        std::vector<triple> result;
 
         struct hash_table;
 

@@ -49,8 +49,7 @@ namespace algorithms{
     nop_join_mt::nop_join_mt(tuple* left, tuple* right, uint64_t size_l,
                              uint64_t size_r, double table_size, uint8_t threads):
             left(left), right(right), size_l(size_l), size_r(size_r),
-            table_size(table_size), threads(threads), built(false),
-            result(std::move(std::make_shared<std::vector<std::vector<triple>>>(threads)))
+            table_size(table_size), threads(threads), built(false), result(threads)
     {}
 
     void nop_join_mt::execute() {
@@ -126,7 +125,7 @@ namespace algorithms{
     void nop_join_mt::probe(uint64_t start, uint64_t end, hash_table* table, uint8_t t_num) {
         for(uint64_t k = start; k < end; ++k){
             tuple& curr = right[k];
-            auto& vec = (*result)[t_num];
+            auto& vec = result[t_num];
             uint64_t index = hash(std::get<0>(curr)) % table->size;
             hash_table::bucket& bucket = table->arr[index];
             // Follow overflow buckets
@@ -161,11 +160,18 @@ namespace algorithms{
         return val;
     }
 
-    std::shared_ptr<std::vector<std::vector<nop_join_mt::triple>>> nop_join_mt::get(){
+    std::vector<std::vector<nop_join_mt::triple>>& nop_join_mt::get(){
         if(!built){
             throw std::logic_error("Join must be performed before querying results.");
         }
         return result;
+    }
+
+    void nop_join_mt::set(std::vector<std::vector<nop_join_mt::triple>> &res_vec) {
+        // The vector is moved for maximum performance. The vector cannot be used by the caller afterwards.
+        result = std::move(res_vec);
+        // Set built to false again, since data was not built into the new vector
+        built = false;
     }
 
 } // namespace algorithms
