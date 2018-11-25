@@ -168,7 +168,7 @@ namespace algorithms{
         context->free_index.pop_back();
         lock.unlock();
         // We get that output buffer, since we wil have to write to it
-        auto output = (context->results)[index];
+        auto& output = (context->results)[index];
         // Run a simple no partitioning join on the given data, due to nop semantics output gets moved
         nop_join join(data_l, data_r, size_l, size_r, context->table_size, output);
         join.execute();

@@ -21,7 +21,7 @@ using namespace algorithms; // NOLINT
  * Helper function. Takes the vector of output vectors and calculates the total length
  * of the output.
  */
-uint64_t get_size_radix(std::vector<std::vector<radix_join_mt::triple>> &output){
+uint64_t get_size_radix(std::vector<std::vector<radix_join_mt::triple>>& output){
     uint64_t size = 0;
     for(auto& vec: output){
         size += vec.size();
