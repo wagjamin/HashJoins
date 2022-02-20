@@ -1,5 +1,7 @@
 ### Hash Joins
 
+**This repo can be seen as deprecated - this was one of my early endavours into C++ and should probably not be taken too seriously.**
+
 Implementation of modern Hash Join algorithms in C++.
 The implementation includes:
 
